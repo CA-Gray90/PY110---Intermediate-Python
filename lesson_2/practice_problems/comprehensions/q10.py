@@ -4,11 +4,14 @@ import random
 HEX_DIGITS = '0123456789abcdef'
 UUID_SECTION_SIZES = (8, 4, 4, 4, 12)
 
-def generate_uuid():
-    return '-'.join([get_hex_digits(length) for length in UUID_SECTION_SIZES])
+# def generate_uuid():
+#     return '-'.join([get_hex_digits(length) for length in UUID_SECTION_SIZES])
 
-def get_hex_digits(length):
-    return ''.join([random.choice(HEX_DIGITS) for _ in range(length)])
+# def get_hex_digits(length):
+#     return ''.join([random.choice(HEX_DIGITS) for _ in range(length)])
+
+def generate_uuid():
+    return '-'.join([''.join([random.choice(HEX_DIGITS) for _ in range(length)]) for length in UUID_SECTION_SIZES])
 
 print(generate_uuid())
 print(generate_uuid())
