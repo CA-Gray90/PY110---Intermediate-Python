@@ -181,21 +181,15 @@ def computer_turn(board, difficulty):
 
         match difficulty:
             case 'n':
-                if medium_move:
-                    choice = medium_move
-                elif hard_move:
-                    choice = hard_move
-                elif nightmare_add_on:
-                    choice = nightmare_add_on
-                else:
-                    choice = easy_move
+                for move in [medium_move, hard_move, nightmare_add_on, easy_move]:
+                    if move:
+                        choice = move
+                        break
             case 'h':
-                if medium_move:
-                    choice = medium_move
-                elif hard_move:
-                    choice = hard_move
-                else:
-                    choice = easy_move
+                for move in [medium_move, hard_move, easy_move]:
+                    if move:
+                        choice = move
+                        break
             case 'm':
                 if medium_move:
                     choice = medium_move
@@ -387,3 +381,4 @@ main()
 #   - slower pauses in easy mode
 #   - shorter pauses for each subsequent difficulty mode?
 # Pylint
+# Any refactoring?
