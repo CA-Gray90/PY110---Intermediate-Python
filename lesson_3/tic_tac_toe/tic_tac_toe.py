@@ -6,6 +6,7 @@ HUMAN_MARK = 'X'
 COMPUTER_MARK = 'O'
 GAMES_TO_WIN_MATCH = 3
 MIDDLE_SQUARE = 5
+CORNER_SQUARES = [1, 3, 7, 9]
 WINNING_COMBOS = [
     [1, 2, 3], [4, 5, 6], [7, 8, 9], # horizontal combos
     [1, 4, 7], [2, 5, 8], [3, 6, 9], # vertical combos
@@ -155,23 +156,55 @@ def player_turn(board):
 
     board[int(player_choice)] = HUMAN_MARK
 
-def computer_turn(board):
+def computer_turn(board, difficulty):
     empty_sqs = empty_squares(board)
-
+        
     if empty_sqs:
         defensive_move = next_winning_move(board, HUMAN_MARK)
         offensive_move = next_winning_move(board, COMPUTER_MARK)
 
-        if offensive_move:
-            computer_choice = offensive_move
-        elif defensive_move:
-            computer_choice = defensive_move
-        elif '5' in empty_sqs:
-            computer_choice = MIDDLE_SQUARE
-        else:
-            computer_choice = random.choice(empty_sqs)
+        match difficulty:
+            case 'h':
+                choice = medium_add_on(defensive_move, offensive_move)
+                if not choice:
+                    choice = hard_add_on(defensive_move, offensive_move, empty_sqs)
+                if not choice:
+                    choice = easy_difficulty_move(empty_sqs)
+            case 'm':
+                choice = medium_add_on(defensive_move, offensive_move)
+                if not choice:
+                    choice = easy_difficulty_move(empty_sqs)
+            case 'e':
+                choice = easy_difficulty_move(empty_sqs)
+            
+            # if offensive_move:
+            #     computer_choice = offensive_move
+            # elif defensive_move:
+            #     computer_choice = defensive_move
+            # elif '5' in empty_sqs:
+            #     computer_choice = MIDDLE_SQUARE
+            # else:
+            #     computer_choice = random.choice(empty_sqs)
 
-        board[int(computer_choice)] = COMPUTER_MARK
+        board[int(choice)] = COMPUTER_MARK
+
+def easy_difficulty_move(empty_squares):
+    return random.choice(empty_squares)
+
+def medium_add_on(defensive_move, offensive_move):
+    if offensive_move:
+        return offensive_move
+    elif defensive_move:
+        return defensive_move
+
+def hard_add_on(empty_squares):
+    if '5' in empty_squares:
+        return MIDDLE_SQUARE
+    else:
+        for sq in CORNER_SQUARES:
+            sq = random.choice([CORNER_SQUARES])
+            if sq in empty_squares:
+                return sq
 
 def board_full(board):
     return empty_squares(board) == []

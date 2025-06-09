@@ -38,7 +38,7 @@ win, mostly likely will keep being a draw.
 
 2.
 - Modify the computers turn to determine which algorithm it will use to play the game
-    - Divide up the algorithm into three functions:
+    - Divide up the algorithm into three if statements based on the difficulty:
         - Easy = random choice
         - Medium = take wins -> block threats 
                                     -> random choice (easy algorithm)
