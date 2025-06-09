@@ -1,5 +1,6 @@
 import os       # Alphabetize imports
 import random
+import pdb
 
 EMPTY_SQUARE = ' ' # Avoid magic constants, use Symbolic Constants
 HUMAN_MARK = 'X'
@@ -77,8 +78,7 @@ def display_difficulty_level(difficulty):
             difficulty_level = 'Medium'
         case 'h':
             difficulty_level = 'Hard'
-    prompt(f'Difficulty chosen: {difficulty_level}')
-    enter_to_continue()
+    prompt(f'{difficulty_level} difficulty mode')
 
 def enter_to_continue():
     prompt('Press Enter to continue...')
@@ -167,7 +167,7 @@ def computer_turn(board, difficulty):
             case 'h':
                 choice = medium_add_on(defensive_move, offensive_move)
                 if not choice:
-                    choice = hard_add_on(defensive_move, offensive_move, empty_sqs)
+                    choice = hard_add_on(empty_sqs)
                 if not choice:
                     choice = easy_difficulty_move(empty_sqs)
             case 'm':
@@ -176,15 +176,6 @@ def computer_turn(board, difficulty):
                     choice = easy_difficulty_move(empty_sqs)
             case 'e':
                 choice = easy_difficulty_move(empty_sqs)
-            
-            # if offensive_move:
-            #     computer_choice = offensive_move
-            # elif defensive_move:
-            #     computer_choice = defensive_move
-            # elif '5' in empty_sqs:
-            #     computer_choice = MIDDLE_SQUARE
-            # else:
-            #     computer_choice = random.choice(empty_sqs)
 
         board[int(choice)] = COMPUTER_MARK
 
@@ -198,13 +189,13 @@ def medium_add_on(defensive_move, offensive_move):
         return defensive_move
 
 def hard_add_on(empty_squares):
+    pdb.set_trace()
     if '5' in empty_squares:
         return MIDDLE_SQUARE
     else:
-        for sq in CORNER_SQUARES:
-            sq = random.choice([CORNER_SQUARES])
-            if sq in empty_squares:
-                return sq
+        avail_corners = [sq for sq in CORNER_SQUARES if str(sq) in empty_squares]
+        if avail_corners:
+            return random.choice(avail_corners)
 
 def board_full(board):
     return empty_squares(board) == []
@@ -282,14 +273,13 @@ def who_goes_first():
     
 def display_who_goes_first(goes_first):
     prompt(f'{goes_first.capitalize()} will go first.')
-    enter_to_continue()
 
-def choose_square(current_player, board):
+def choose_square(current_player, board, difficulty):
     match current_player:
         case 'player':
             player_turn(board)
         case 'computer':
-            computer_turn(board)
+            computer_turn(board, difficulty)
 
 def alternate_player(current_player):
     match current_player:
@@ -308,13 +298,14 @@ def main():
     clear_terminal()
     display_welcome()
     display_rules()
-    difficulty = choose_difficulty()
 
     while True:
         scorekeeper = initialize_empty_scorekeeper()
+        difficulty = choose_difficulty()
         goes_first = who_goes_first()
         display_who_goes_first(goes_first)
         display_difficulty_level(difficulty)
+        enter_to_continue()
 
         while True:
             board = initialize_empty_board()
@@ -327,7 +318,7 @@ def main():
                 display_scoreboard(scorekeeper)
                 display_ingame_board(board)
 
-                choose_square(current_player, board)
+                choose_square(current_player, board, difficulty)
                 current_player = alternate_player(current_player)
                 if board_full(board) or winning_board(board):
                     break
