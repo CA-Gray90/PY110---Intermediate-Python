@@ -1,6 +1,5 @@
 import os       # Alphabetize imports
 import random
-import pdb
 
 EMPTY_SQUARE = ' ' # Avoid magic constants, use Symbolic Constants
 HUMAN_MARK = 'X'
@@ -61,11 +60,21 @@ def display_rules():
 
 def choose_difficulty():
     prompt('Please choose the difficulty level for this match:\n'
-           'Easy, Medium or Hard (e/m/h)')
+           'Easy, Medium, Hard or Nightmare (e/m/h/n)')
     answer = input().strip().lower()
     while True:
-        if answer in ['easy', 'medium', 'hard', 'e', 'm', 'h']:
-            return answer[0]
+        if answer in ['easy', 'medium', 'hard', 'nightmare', 'n', 'e', 'm', 'h']:
+            if answer[0] == 'n':
+                prompt('WARNING: NIGHTMARE MODE IS VIRTUALLY IMPOSSIBLE TO BEAT.')
+                prompt('The creator of this game regrets unleashing such a'
+                       ' powerful AI. Are you sure you wish to play this mode? (y/n)')
+                if not yes_or_no():
+                    prompt('Choose your difficulty level again (e/m/h/n):')
+                    answer = input().strip().lower()
+                else:
+                    return answer[0]
+            else:
+                return answer[0]
         else:
             prompt('Oops, invalid input, please try again:')
             answer = input().strip().lower()
@@ -78,6 +87,8 @@ def display_difficulty_level(difficulty):
             difficulty_level = 'Medium'
         case 'h':
             difficulty_level = 'Hard'
+        case 'n':
+            difficulty_level = 'Nightmare'
     prompt(f'{difficulty_level} difficulty mode')
 
 def enter_to_continue():
@@ -162,20 +173,36 @@ def computer_turn(board, difficulty):
     if empty_sqs:
         defensive_move = next_winning_move(board, HUMAN_MARK)
         offensive_move = next_winning_move(board, COMPUTER_MARK)
+        
+        easy_move = easy_difficulty_move(empty_sqs)
+        medium_move = medium_add_on(defensive_move, offensive_move)
+        hard_move = hard_add_on(empty_sqs)
+        nightmare_add_on = nightmare_mode_add_on(empty_sqs)
 
         match difficulty:
+            case 'n':
+                if medium_move:
+                    choice = medium_move
+                elif hard_move:
+                    choice = hard_move
+                elif nightmare_add_on:
+                    choice = nightmare_add_on
+                else:
+                    choice = easy_move
             case 'h':
-                choice = medium_add_on(defensive_move, offensive_move)
-                if not choice:
-                    choice = hard_add_on(empty_sqs)
-                if not choice:
-                    choice = easy_difficulty_move(empty_sqs)
+                if medium_move:
+                    choice = medium_move
+                elif hard_move:
+                    choice = hard_move
+                else:
+                    choice = easy_move
             case 'm':
-                choice = medium_add_on(defensive_move, offensive_move)
-                if not choice:
-                    choice = easy_difficulty_move(empty_sqs)
+                if medium_move:
+                    choice = medium_move
+                else:
+                    choice = easy_move
             case 'e':
-                choice = easy_difficulty_move(empty_sqs)
+                choice = easy_move
 
         board[int(choice)] = COMPUTER_MARK
 
@@ -187,15 +214,18 @@ def medium_add_on(defensive_move, offensive_move):
         return offensive_move
     elif defensive_move:
         return defensive_move
+    return None
 
 def hard_add_on(empty_squares):
-    pdb.set_trace()
     if '5' in empty_squares:
         return MIDDLE_SQUARE
-    else:
-        avail_corners = [sq for sq in CORNER_SQUARES if str(sq) in empty_squares]
-        if avail_corners:
-            return random.choice(avail_corners)
+    return None
+
+def nightmare_mode_add_on(empty_squares):
+    avail_corners = [sq for sq in CORNER_SQUARES if str(sq) in empty_squares]
+    if avail_corners:
+        return random.choice(avail_corners)
+    return None
 
 def board_full(board):
     return empty_squares(board) == []
@@ -353,13 +383,7 @@ def main():
 main()
 
 # TODO:
-
-# - Display the difficulty choice
-#   - add it to game rules
-#   - Add function to choose difficulty to game mechanics
-#   - Add refactor computer move choices into 3 functions; easy, medium, hard
-#   - Refactor computer plays function to take difficulty argument to determine
-# which algorithms to use against player
-#   - Add difficulty choice when player wish to play another match
-
+# Add timing pauses to make game feel more interactive
+#   - slower pauses in easy mode
+#   - shorter pauses for each subsequent difficulty mode?
 # Pylint
