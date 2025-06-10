@@ -1,6 +1,7 @@
 import os       # Alphabetize imports
 import random
 from time import sleep
+import json
 
 EMPTY_SQUARE = ' ' # Avoid magic constants, use Symbolic Constants
 HUMAN_MARK = 'X'
@@ -18,6 +19,9 @@ GOES_FIRST = 'choose'
 GAME_TITLE = ' *** Ultimate Tic Tac Toe *** '
 BOARD_SQUARE_POSITIONS = {num : num for num in range(1, 10)}
 
+with open('messages_ttt.json', 'r') as file:
+    MESSAGES = json.load(file)
+
 def clear_terminal():
     os.system('clear')
 
@@ -34,52 +38,47 @@ def display_welcome():
     print('Welcome to'.center(len(GAME_TITLE), ' '))
     print(GAME_TITLE)
     print()
-    prompt('In this revolutionary game, '
-           'you will pit yourself against a super intelligent AI player.\n'
-           'Can you beat it?')
+    prompt(MESSAGES['welcome_msg'])
     print()
 
 def display_rules():
     prompt('Would you like to see the rules? (y/n)')
     if yes_or_no():
         prompt('Here are the rules:')
-        list_text('Each player gets a turn at putting a mark in a square on the board')
-        list_text('The first player with 3 marks in a row, column or diagonal wins the game')
+        list_text(MESSAGES['rules_turns'])
+        list_text(MESSAGES['rules_wins'])
         print()
         list_text(f'First player to {GAMES_TO_WIN_MATCH} games will win the match')
-        list_text('The match winner is the overall winner')
+        list_text(MESSAGES['rules_match_win'])
         print()
-        list_text('When prompted to mark your square, you must enter a number that'
-               ' corresponds to the square you intend to mark')
+        list_text(MESSAGES['rules_marks'])
         print()
         list_text('The square positions are numbered as follows:')
         display_board(BOARD_SQUARE_POSITIONS)
-        list_text('You will be prompted to choose who goes first and for a difficulty level')
+        list_text(MESSAGES['rules_difficulty'])
         print()
         prompt('Now that you know the rules, you are ready to play!')
         enter_to_continue()
 
 def choose_difficulty():
-    prompt('Please choose the difficulty level for this match:\n'
-           'Easy, Medium, Hard or Nightmare (e/m/h/n)')
+    prompt(MESSAGES['choose_difficulty'])
     answer = input().strip().lower()
     while True:
         if answer in ['easy', 'medium', 'hard', 'nightmare', 'n', 'e', 'm', 'h']:
             if answer[0] == 'n':
-                prompt('WARNING: NIGHTMARE MODE IS VIRTUALLY IMPOSSIBLE TO BEAT.')
-                prompt('The creator of this game regrets unleashing such a'
-                       ' powerful AI. Are you sure you wish to play this mode? (y/n)')
+                prompt(MESSAGES['nightmare_msg_warning'])
+                prompt(MESSAGES['nightmare_msg_retry'])
                 if not yes_or_no():
-                    prompt('Choose your difficulty level again (e/m/h/n):')
+                    prompt('Choose your difficulty level (e/m/h/n):')
                     answer = input().strip().lower()
                 else:
                     return answer[0]
             else:
                 return answer[0]
         else:
-            prompt('Oops, invalid input, please try again:')
+            prompt(MESSAGES['invalid_input_msg'])
             answer = input().strip().lower()
-    
+
 def display_difficulty_level(difficulty):
     match difficulty:
         case 'e':
@@ -102,7 +101,7 @@ def yes_or_no():
         if answer.lower() in {'y', 'yes', 'n', 'no'}:
             return answer[0].lower() == 'y'
         else:
-            prompt('Invalid input, please try again:')
+            prompt(MESSAGES['invalid_input_msg'])
             answer = input().strip()
 
 def initialize_empty_board():
@@ -168,17 +167,17 @@ def player_turn(board):
         if player_choice in valid_choices:
             break
 
-        prompt('Sorry, that was not a valid choice. Try again.')
+        prompt(MESSAGES['invalid_input_msg'])
 
     board[int(player_choice)] = HUMAN_MARK
 
 def computer_turn(board, difficulty):
     empty_sqs = empty_squares(board)
-        
+
     if empty_sqs:
         defensive_move = next_winning_move(board, HUMAN_MARK)
         offensive_move = next_winning_move(board, COMPUTER_MARK)
-        
+
         easy_move = easy_difficulty_move(empty_sqs)
         medium_move = medium_add_on(defensive_move, offensive_move)
         hard_move = hard_add_on(empty_sqs)
@@ -245,7 +244,7 @@ def detect_winner(board):
                 and board[sq2] == COMPUTER_MARK\
                 and board[sq3] == COMPUTER_MARK:
             return 'computer'
-        
+   
     return None
 
 def update_scorekeeper(board, scorekeeper):
@@ -272,20 +271,18 @@ def get_match_winner(scorekeeper):
 def display_match_winner(match_winner):
     if match_winner == 'player':
         print()
-        prompt('*** Congratulations! You won the match! ***')
-        prompt("Looks like AI won't be coming for our jobs just yet!")
+        prompt(MESSAGES['match_win_msg'])
+        prompt(MESSAGES['match_win_quip'])
         print()
     elif match_winner == 'computer':
         print()
-        prompt('*** You lost! ***')
-        prompt('Unfortunately you have lost the match! Looks like AI'
-        ' might be coming after our jobs after all...')
+        prompt(MESSAGES['match_loss_msg'])
+        prompt(MESSAGES['match_loss_quip'])
         print()
 
 def who_goes_first():
     if GOES_FIRST == 'choose':
-        prompt('Choose who will take the first turn in each game of this match:\n'
-               "Enter either 'Player', 'Computer' or 'Random' (p/c/r):")
+        prompt(MESSAGES['goes_first_choice_msg'])
         answer = input().strip()
         while True:
             if answer.lower() in {'p', 'player', 'c', 'computer', 'r', 'random'}:
@@ -297,11 +294,11 @@ def who_goes_first():
                     case 'r':
                         return random.choice(['player', 'computer'])
             else:
-                prompt('Oops that was an invalid input, please try again:')
+                prompt(MESSAGES['invalid_input_msg'])
                 answer = input().strip()
     else:
         return GOES_FIRST
-    
+
 def display_who_goes_first(goes_first):
     prompt(f'{goes_first.capitalize()} will go first.')
 
@@ -353,8 +350,6 @@ def play_game(goes_first, scorekeeper, difficulty):
             pause = current_player == 'computer'
 
             choose_square(current_player, board, difficulty)
-
-
             current_player = alternate_player(current_player)
             if board_full(board) or winning_board(board):
                 break
@@ -366,7 +361,7 @@ def play_game(goes_first, scorekeeper, difficulty):
             prompt(f'{detect_winner(board).capitalize()} won the game!')
         else:
             prompt("It's a tie!")
-        
+
         if get_match_winner(scorekeeper):
             break
 
@@ -402,7 +397,5 @@ def main():
 main()
 
 # TODO:
-
-# - JSON file to declutter: rules display, match winner messages, welcome message, rules message
 # Pylint
 # Any refactoring?

@@ -1,3 +1,17 @@
 {
     "welcome_msg": "In this revolutionary game, you will pit yourself against a super intelligent AI player.\nCan you beat it?",
+    "rules_turns": "Each player gets a turn at putting a mark in a square on the board",
+    "rules_wins": "The first player with 3 marks in a row, column or diagonal wins the game",
+    "rules_match_win": "The match winner is the overall winner",
+    "rules_marks": "When prompted to mark your square, you must enter a number that corresponds to the square you intend to mark",
+    "rules_difficulty": "You will be prompted to choose who goes first and for a difficulty level",
+    "choose_difficulty": "Please choose the difficulty level for this match:\nEasy, Medium, Hard or Nightmare (e/m/h/n)",
+    "nightmare_msg_warning": "WARNING: NIGHTMARE MODE IS VIRTUALLY IMPOSSIBLE TO BEAT.",
+    "nightmare_msg_retry": "The creator of this game regrets unleashing such a powerful AI. Are you sure you wish to play this mode? (y/n)",
+    "invalid_input_msg": "Oops, invalid input, please try again",
+    "match_win_msg": "*** Congratulations! You won the match! ***",
+    "match_win_quip": "Looks like AI won't be coming for our jobs just yet!",
+    "match_loss_msg": "*** You lost! ***",
+    "match_loss_quip": "Unfortunately you have lost the match! Looks like AI might be coming after our jobs after all...",
+    "goes_first_choice_msg": "Choose who will take the first turn in each game of this match:\nEnter either 'Player', 'Computer' or 'Random' (p/c/r):"
 }
