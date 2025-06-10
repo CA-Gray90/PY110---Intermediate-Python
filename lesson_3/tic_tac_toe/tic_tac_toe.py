@@ -202,8 +202,10 @@ def computer_turn(board, difficulty):
                     choice = easy_move
             case 'e':
                 choice = easy_move
-
         board[int(choice)] = COMPUTER_MARK
+
+        interval = random.randrange(2, 7) / 10
+        sleep(interval)
 
 def easy_difficulty_move(empty_squares):
     return random.choice(empty_squares)
@@ -342,11 +344,17 @@ def play_game(goes_first, scorekeeper, difficulty):
     while True:
         board = initialize_empty_board()
         current_player = goes_first
+        pause = current_player == 'computer'
 
         while True:
             clear_and_display_game_info(board, scorekeeper)
+            if pause:
+                sleep(0.5)
+            pause = current_player == 'computer'
 
             choose_square(current_player, board, difficulty)
+
+
             current_player = alternate_player(current_player)
             if board_full(board) or winning_board(board):
                 break
@@ -394,8 +402,7 @@ def main():
 main()
 
 # TODO:
-# Add timing pauses to make game feel more interactive
-#   - slower pauses in easy mode
-#   - shorter pauses for each subsequent difficulty mode?
+
+# - JSON file to declutter: rules display, match winner messages, welcome message, rules message
 # Pylint
 # Any refactoring?
