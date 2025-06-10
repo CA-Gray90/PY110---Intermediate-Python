@@ -49,7 +49,7 @@ def display_rules():
         list_text(MESSAGES['rules_wins'])
         print()
         list_text(f'First player to {GAMES_TO_WIN_MATCH}'
-                  'games will win the match')
+                  ' games will win the match')
         list_text(MESSAGES['rules_match_win'])
         print()
         list_text(MESSAGES['rules_marks'])
@@ -65,21 +65,12 @@ def choose_difficulty():
     prompt(MESSAGES['choose_difficulty'])
     answer = input().strip().lower()
     while True:
-        if answer in ['easy', 'medium', 'hard', 'nightmare',
-                      'n', 'e', 'm', 'h']:
-            if answer[0] == 'n':
-                prompt(MESSAGES['nightmare_msg_warning'])
-                prompt(MESSAGES['nightmare_msg_retry'])
-                if not yes_or_no():
-                    prompt('Choose your difficulty level (e/m/h/n):')
-                    answer = input().strip().lower()
-                else:
-                    return answer[0]
-            else:
-                return answer[0]
-        else:
-            prompt(MESSAGES['invalid_input_msg'])
-            answer = input().strip().lower()
+        if answer in ['easy', 'medium', 'hard',
+                      'e', 'm', 'h']:
+            return answer[0]
+
+        prompt(MESSAGES['invalid_input_msg'])
+        answer = input().strip().lower()
 
 def display_difficulty_level(difficulty):
     match difficulty:
@@ -89,8 +80,6 @@ def display_difficulty_level(difficulty):
             difficulty_level = 'Medium'
         case 'h':
             difficulty_level = 'Hard'
-        case 'n':
-            difficulty_level = 'Nightmare'
     prompt(f'{difficulty_level} difficulty mode')
 
 def enter_to_continue():
@@ -183,15 +172,8 @@ def computer_turn(board, difficulty):
         easy_move = easy_difficulty_move(empty_sqs)
         medium_move = medium_add_on(defensive_move, offensive_move)
         hard_move = hard_add_on(empty_sqs)
-        nightmare_add_on = nightmare_mode_add_on(empty_sqs)
 
         match difficulty:
-            case 'n':
-                for move in [medium_move, hard_move,
-                             nightmare_add_on, easy_move]:
-                    if move:
-                        choice = move
-                        break
             case 'h':
                 for move in [medium_move, hard_move, easy_move]:
                     if move:
@@ -222,12 +204,6 @@ def medium_add_on(defensive_move, offensive_move):
 def hard_add_on(empty_sqs):
     if '5' in empty_sqs:
         return MIDDLE_SQUARE
-    return None
-
-def nightmare_mode_add_on(empty_sqs):
-    avail_corners = [sq for sq in CORNER_SQUARES if str(sq) in empty_sqs]
-    if avail_corners:
-        return random.choice(avail_corners)
     return None
 
 def board_full(board):
@@ -399,5 +375,4 @@ def main():
 
 main()
 
-# Pylint
 # Any refactoring?
