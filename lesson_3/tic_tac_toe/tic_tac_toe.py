@@ -48,7 +48,8 @@ def display_rules():
         list_text(MESSAGES['rules_turns'])
         list_text(MESSAGES['rules_wins'])
         print()
-        list_text(f'First player to {GAMES_TO_WIN_MATCH} games will win the match')
+        list_text(f'First player to {GAMES_TO_WIN_MATCH}'
+                  'games will win the match')
         list_text(MESSAGES['rules_match_win'])
         print()
         list_text(MESSAGES['rules_marks'])
@@ -64,7 +65,8 @@ def choose_difficulty():
     prompt(MESSAGES['choose_difficulty'])
     answer = input().strip().lower()
     while True:
-        if answer in ['easy', 'medium', 'hard', 'nightmare', 'n', 'e', 'm', 'h']:
+        if answer in ['easy', 'medium', 'hard', 'nightmare',
+                      'n', 'e', 'm', 'h']:
             if answer[0] == 'n':
                 prompt(MESSAGES['nightmare_msg_warning'])
                 prompt(MESSAGES['nightmare_msg_retry'])
@@ -100,9 +102,9 @@ def yes_or_no():
     while True:
         if answer.lower() in {'y', 'yes', 'n', 'no'}:
             return answer[0].lower() == 'y'
-        else:
-            prompt(MESSAGES['invalid_input_msg'])
-            answer = input().strip()
+
+        prompt(MESSAGES['invalid_input_msg'])
+        answer = input().strip()
 
 def initialize_empty_board():
     return {num: EMPTY_SQUARE for num in range(1, 10)}
@@ -122,7 +124,7 @@ def display_ingame_board(board):
     prompt(f'Your mark is {HUMAN_MARK}. Computers mark is {COMPUTER_MARK}.')
     display_board(board)
 
-def empty_squares(board):
+def get_empty_squares(board):
     return [str(key) for key, value in board.items()
                      if value == EMPTY_SQUARE]
 
@@ -139,7 +141,8 @@ def display_scoreboard(scorekeeper):
     print(title.center(length, ' '))
 
     for player, score in scorekeeper.items():
-        line = f'| ' + f'{player.capitalize()}'.ljust(len(longer_name)) + ': ' + f'{score}  |'
+        line = '| ' + f'{player.capitalize()}'.ljust(len(longer_name)) \
+            + ': ' + f'{score}  |'
         print(line.center(length, ' '))
 
     print(f'+-{'-' * max_display_length}-+'.center(length, ' '))
@@ -152,14 +155,13 @@ def join_or(lst, delimiter=', ', final_joiner='or'):
         result.extend([f'{final_joiner} ', lst_str[-1]])
         return ''.join(result)
 
-    elif len(lst_str) == 2:
+    if len(lst_str) == 2:
         return f'{lst_str[0]} {final_joiner} {lst_str[1]}'
 
-    else:
-        return ''.join(lst_str)
+    return ''.join(lst_str)
 
 def player_turn(board):
-    valid_choices = empty_squares(board)
+    valid_choices = get_empty_squares(board)
     while True:
         prompt(f'Please choose a square to mark from the following choices:\n'
                f'({join_or(valid_choices)})')
@@ -172,7 +174,7 @@ def player_turn(board):
     board[int(player_choice)] = HUMAN_MARK
 
 def computer_turn(board, difficulty):
-    empty_sqs = empty_squares(board)
+    empty_sqs = get_empty_squares(board)
 
     if empty_sqs:
         defensive_move = next_winning_move(board, HUMAN_MARK)
@@ -185,7 +187,8 @@ def computer_turn(board, difficulty):
 
         match difficulty:
             case 'n':
-                for move in [medium_move, hard_move, nightmare_add_on, easy_move]:
+                for move in [medium_move, hard_move,
+                             nightmare_add_on, easy_move]:
                     if move:
                         choice = move
                         break
@@ -206,29 +209,29 @@ def computer_turn(board, difficulty):
         interval = random.randrange(2, 7) / 10
         sleep(interval)
 
-def easy_difficulty_move(empty_squares):
-    return random.choice(empty_squares)
+def easy_difficulty_move(empty_sqs):
+    return random.choice(empty_sqs)
 
 def medium_add_on(defensive_move, offensive_move):
     if offensive_move:
         return offensive_move
-    elif defensive_move:
+    if defensive_move:
         return defensive_move
     return None
 
-def hard_add_on(empty_squares):
-    if '5' in empty_squares:
+def hard_add_on(empty_sqs):
+    if '5' in empty_sqs:
         return MIDDLE_SQUARE
     return None
 
-def nightmare_mode_add_on(empty_squares):
-    avail_corners = [sq for sq in CORNER_SQUARES if str(sq) in empty_squares]
+def nightmare_mode_add_on(empty_sqs):
+    avail_corners = [sq for sq in CORNER_SQUARES if str(sq) in empty_sqs]
     if avail_corners:
         return random.choice(avail_corners)
     return None
 
 def board_full(board):
-    return empty_squares(board) == []
+    return get_empty_squares(board) == []
 
 def winning_board(board):
     return bool(detect_winner(board))
@@ -240,11 +243,10 @@ def detect_winner(board):
                 and board[sq2] == HUMAN_MARK\
                 and board[sq3] == HUMAN_MARK:
             return 'player'
-        elif board[sq1] == COMPUTER_MARK\
+        if board[sq1] == COMPUTER_MARK\
                 and board[sq2] == COMPUTER_MARK\
                 and board[sq3] == COMPUTER_MARK:
             return 'computer'
-   
     return None
 
 def update_scorekeeper(board, scorekeeper):
@@ -285,7 +287,8 @@ def who_goes_first():
         prompt(MESSAGES['goes_first_choice_msg'])
         answer = input().strip()
         while True:
-            if answer.lower() in {'p', 'player', 'c', 'computer', 'r', 'random'}:
+            if answer.lower() in {'p', 'player', 'c',
+                                  'computer', 'r', 'random'}:
                 match answer[0]:
                     case 'p':
                         return 'player'
@@ -396,6 +399,5 @@ def main():
 
 main()
 
-# TODO:
 # Pylint
 # Any refactoring?
