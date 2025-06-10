@@ -317,6 +317,41 @@ def play_again():
     answer = yes_or_no()
     return answer
 
+def clear_and_display_game_info(board, scorekeeper):
+    clear_terminal()
+    display_game_title()
+
+    display_scoreboard(scorekeeper)
+    display_ingame_board(board)
+
+def play_game(goes_first, scorekeeper, difficulty):
+    while True:
+        board = initialize_empty_board()
+        current_player = goes_first
+
+        while True:
+            clear_and_display_game_info(board, scorekeeper)
+
+            choose_square(current_player, board, difficulty)
+            current_player = alternate_player(current_player)
+            if board_full(board) or winning_board(board):
+                break
+
+        update_scorekeeper(board, scorekeeper)
+        clear_and_display_game_info(board, scorekeeper)
+
+        if winning_board(board):
+            prompt(f'{detect_winner(board).capitalize()} won the game!')
+        else:
+            prompt("It's a tie!")
+        
+        if get_match_winner(scorekeeper):
+            break
+
+        prompt('Are you ready for the next game? (y/n)')
+        if not yes_or_no():
+            break
+
 # Main Program:
 def main():
     clear_terminal()
@@ -327,45 +362,12 @@ def main():
         scorekeeper = initialize_empty_scorekeeper()
         difficulty = choose_difficulty()
         goes_first = who_goes_first()
+
         display_who_goes_first(goes_first)
         display_difficulty_level(difficulty)
         enter_to_continue()
 
-        while True:
-            board = initialize_empty_board()
-            current_player = goes_first
-
-            while True:
-                clear_terminal()
-                display_game_title()
-
-                display_scoreboard(scorekeeper)
-                display_ingame_board(board)
-
-                choose_square(current_player, board, difficulty)
-                current_player = alternate_player(current_player)
-                if board_full(board) or winning_board(board):
-                    break
-
-            clear_terminal()
-            update_scorekeeper(board, scorekeeper)
-
-            display_game_title()
-            display_scoreboard(scorekeeper)
-            display_ingame_board(board)
-
-            if winning_board(board):
-                prompt(f'{detect_winner(board).capitalize()} won the game!')
-            else:
-                prompt("It's a tie!")
-            
-            if get_match_winner(scorekeeper):
-                break
-
-            prompt('Are you ready for the next game? (y/n)')
-            if not yes_or_no():
-                break
-        
+        play_game(goes_first, scorekeeper, difficulty)
         match_winner = get_match_winner(scorekeeper)
         display_match_winner(match_winner)
 
