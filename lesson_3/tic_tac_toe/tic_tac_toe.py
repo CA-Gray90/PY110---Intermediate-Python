@@ -1,5 +1,6 @@
 import os       # Alphabetize imports
 import random
+from time import sleep
 
 EMPTY_SQUARE = ' ' # Avoid magic constants, use Symbolic Constants
 HUMAN_MARK = 'X'
@@ -108,12 +109,13 @@ def initialize_empty_board():
     return {num: EMPTY_SQUARE for num in range(1, 10)}
 
 def display_board(board):
+    length = len(GAME_TITLE)
     print()
-    print(f' {board[1]} | {board[2]} | {board[3]}')
-    print('---|---|---')
-    print(f' {board[4]} | {board[5]} | {board[6]}')
-    print('---|---|---')
-    print(f' {board[7]} | {board[8]} | {board[9]}')
+    print(f' {board[1]} | {board[2]} | {board[3]} '.center(length, ' '))
+    print('---|---|---'.center(length, ' '))
+    print(f' {board[4]} | {board[5]} | {board[6]} '.center(length, ' '))
+    print('---|---|---'.center(length, ' '))
+    print(f' {board[7]} | {board[8]} | {board[9]} '.center(length, ' '))
     print()
 
 def display_ingame_board(board):
@@ -129,16 +131,19 @@ def initialize_empty_scorekeeper():
     return {'player' : 0, 'computer' : 0}
 
 def display_scoreboard(scorekeeper):
+    length = len(GAME_TITLE)
     longer_name = max(scorekeeper.keys(), key=len)
     max_display_length = len(longer_name + ' : 0')
+    title = '| ' + 'SCOREBOARD'.center(max_display_length, ' ') + ' |'
 
-    print('+-' + '-' * max_display_length + '-+')
-    print(f'|', 'SCOREBOARD'.center(max_display_length, ' '), '|')
+    print(f'+-{'-' * max_display_length}-+'.center(length, ' '))
+    print(title.center(length, ' '))
 
     for player, score in scorekeeper.items():
-        print('|', f'{player.capitalize()}'.ljust(len(longer_name)), ':', f'{score} |')
+        line = f'| ' + f'{player.capitalize()}'.ljust(len(longer_name)) + ': ' + f'{score}  |'
+        print(line.center(length, ' '))
 
-    print('+-' + '-' * max_display_length + '-+')
+    print(f'+-{'-' * max_display_length}-+'.center(length, ' '))
 
 def join_or(lst, delimiter=', ', final_joiner='or'):
     lst_str = [str(num) for num in lst]
@@ -312,6 +317,15 @@ def alternate_player(current_player):
         case 'computer':
             return 'player'
 
+def display_countdown():
+    clear_terminal()
+    prompt('Game Starts in...')
+    for num in range(3, 0, -1):
+        print(f'..{num}')
+        sleep(1)
+    print('Start!')
+    sleep(1)
+
 def play_again():
     prompt('Would you like to play another match? (y/n)')
     answer = yes_or_no()
@@ -366,6 +380,7 @@ def main():
         display_who_goes_first(goes_first)
         display_difficulty_level(difficulty)
         enter_to_continue()
+        display_countdown()
 
         play_game(goes_first, scorekeeper, difficulty)
         match_winner = get_match_winner(scorekeeper)
