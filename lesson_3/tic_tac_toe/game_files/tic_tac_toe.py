@@ -1,9 +1,9 @@
-import os       # Alphabetize imports
+import json
+import os
 import random
 from time import sleep
-import json
 
-EMPTY_SQUARE = ' ' # Avoid magic constants, use Symbolic Constants
+EMPTY_SQUARE = ' '
 HUMAN_MARK = 'X'
 COMPUTER_MARK = 'O'
 GAMES_TO_WIN_MATCH = 3
