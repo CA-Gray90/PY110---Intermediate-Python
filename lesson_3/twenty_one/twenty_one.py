@@ -119,19 +119,22 @@ def automatic_stay(hand):
     '''
     return hand_total(hand) == 21 and len(hand) > 2
 
-def display_hands(game_data, dealer_turn=False):
+def display_hands(game_data, dealer=False):
     # Simple display of all hands for now
     # clear_terminal()
+    print()
+    prompt('============= DISPLAY ============')
     for player_hand in game_data['player_hands']:
         hand = get_hand(player_hand, game_data)
         if player_hand != 'dealer':
             print(f'{player_hand} : {hand}')
             print(f'Total: {hand_total(hand)}')
-        elif dealer_turn != True and player_hand == 'dealer':
+        elif dealer != True and player_hand == 'dealer':
             print(f'Dealers first card: {hand[0]}')
-        elif dealer_turn == True:
+        elif dealer == True:
             print(f'Dealers hand revealed: {hand}')
             print(f'Dealers total: {hand_total(hand)}')
+    print()
 
 # Players turn
 def players_turn(hand, deck):
@@ -147,15 +150,25 @@ def players_turn(hand, deck):
         prompt(f'New card is a {new_card['card']} of {new_card['suite']}')
         hand.append(new_card)
         return 'hit'
-    
 
-def turn(who, game_data, dealer_turn=False):
-    # Get the hand of whoevers turn it is.
+# Dealer turn
+def dealer_turn(hand, deck):
+    dealer_hand_total = hand_total(hand)
+
+    if dealer_hand_total >= 17:
+        prompt('Dealer total is >= 17; the Dealer stays.')
+        return 'stay'
+    else:
+        print('Dealer hits!')
+        new_card = deal_card(deck)
+        print(f'Dealers new card: {new_card}')
+        hand.append(new_card)
+        return 'hit'
+    
+def turn(who, game_data, dealer=False):
     hand = get_hand(who, game_data)
-    # Get the deck
     deck = game_data['deck']
 
-    # Checks
     if is_blackjack(hand):
         prompt(f'{who} got a blackjack!')
         return
@@ -166,20 +179,20 @@ def turn(who, game_data, dealer_turn=False):
         prompt(f'{who} busted!')
         return
     
-    if dealer_turn == False:
+    if dealer == False:
         outcome = players_turn(hand, deck)
         return outcome
     else:
         outcome = dealer_turn(hand, deck)
         return outcome
 
-
-
 def adjust_game_results(game_data, game_results):
     for player in game_data['player_hands']:
         hand = get_hand(player, game_data)
         if busted(hand):
             game_results[player] = 'bust'
+        elif is_blackjack(hand):
+            game_results[player] = 'blackjack'
         else:
             game_results[player] = hand_total(hand)
 
@@ -189,9 +202,6 @@ def game_end(game_data):
         if busted(hand) or is_blackjack(hand):
             return True
         return False
-
-def dealer_turn(hand, deck):
-    
 
 # Gets winner, does not return a tie yet.
 def get_winner(game_results):
@@ -216,22 +226,27 @@ def main():
         game_results = initialize_game_results_dict(game_data)
 
         deal_hands(game_data)
-        display_hands(game_data)
-        player1_hand = get_hand('player1', game_data)
-        dealer_hand = get_hand('dealer', game_data)
+        # display_hands(game_data)
+        # player1_hand = get_hand('player1', game_data)
+        # dealer_hand = get_hand('dealer', game_data)
 
         # Player turn:
-        players_turn(player1_hand, deck)
-        adjust_game_results(game_data, game_results)
-
+        while True:
+            display_hands(game_data)
+            outcome = turn('player1', game_data)
+            adjust_game_results(game_data, game_results)
+            if outcome != 'hit':
+                break
+    
         if game_end(game_data):
             prompt('Game is over')
-
-        # Dealer Turn:
-        else:
-            display_hands(game_data, dealer_turn=True)
-            dealer_turn(dealer_hand, deck)
-            adjust_game_results(game_data, game_results)
+        else:   # Dealer Turn
+            while True:
+                display_hands(game_data, dealer=True)
+                outcome = turn('dealer', game_data, dealer=True)
+                adjust_game_results(game_data, game_results)
+                if outcome != 'hit':
+                    break
 
         print(game_results)
         get_winner(game_results)
