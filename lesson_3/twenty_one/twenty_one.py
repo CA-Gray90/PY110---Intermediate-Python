@@ -135,7 +135,18 @@ def display_hands(game_data, dealer_turn=False):
 
 # Players turn
 def players_turn(hand, deck):
-    # hit or stay?
+    prompt('Hit or Stay? (h/s)')
+    answer = get_valid_input('h', 'hit', 's', 'stay')
+
+    if answer[0].lower() == 's':
+        prompt('Player chooses to stay.')
+        return 'stay'
+    else:
+        prompt('Player hits!')
+        new_card = deal_card(deck)
+        prompt(f'New card is a {new_card['card']} of {new_card['suite']}')
+        hand.append(new_card)
+        return 'hit'
     
 
 def turn(who, game_data, dealer_turn=False):
@@ -144,7 +155,7 @@ def turn(who, game_data, dealer_turn=False):
     # Get the deck
     deck = game_data['deck']
 
-    # Check if blackjack
+    # Checks
     if is_blackjack(hand):
         prompt(f'{who} got a blackjack!')
         return
@@ -156,7 +167,11 @@ def turn(who, game_data, dealer_turn=False):
         return
     
     if dealer_turn == False:
-        players_turn(hand, deck)
+        outcome = players_turn(hand, deck)
+        return outcome
+    else:
+        outcome = dealer_turn(hand, deck)
+        return outcome
 
 
 
@@ -176,7 +191,7 @@ def game_end(game_data):
         return False
 
 def dealer_turn(hand, deck):
-    pass
+    
 
 # Gets winner, does not return a tie yet.
 def get_winner(game_results):
