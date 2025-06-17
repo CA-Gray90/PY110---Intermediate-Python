@@ -133,6 +133,33 @@ def display_hands(game_data, dealer_turn=False):
             print(f'Dealers hand revealed: {hand}')
             print(f'Dealers total: {hand_total(hand)}')
 
+# Players turn
+def players_turn(hand, deck):
+    # hit or stay?
+    
+
+def turn(who, game_data, dealer_turn=False):
+    # Get the hand of whoevers turn it is.
+    hand = get_hand(who, game_data)
+    # Get the deck
+    deck = game_data['deck']
+
+    # Check if blackjack
+    if is_blackjack(hand):
+        prompt(f'{who} got a blackjack!')
+        return
+    if automatic_stay(hand):
+        prompt(f'{who} made 21, this is an automatic stay.')
+        return
+    if busted(hand):
+        prompt(f'{who} busted!')
+        return
+    
+    if dealer_turn == False:
+        players_turn(hand, deck)
+
+
+
 def adjust_game_results(game_data, game_results):
     for player in game_data['player_hands']:
         hand = get_hand(player, game_data)
@@ -140,33 +167,6 @@ def adjust_game_results(game_data, game_results):
             game_results[player] = 'bust'
         else:
             game_results[player] = hand_total(hand)
-
-# Players turn
-def players_turn(hand, deck):
-    while True:
-        if busted(hand):
-            print('Player busted!')
-            break
-
-        if is_blackjack(hand):
-            print('Blackjack! Player wins.')
-            break
-
-        if automatic_stay(hand):
-            print('player must stay (auto)')
-            break
-
-        prompt('Hit or Stay? (h/s)')
-        answer = get_valid_input('h', 'hit', 's', 'stay')
-        if answer[0].lower() == 's':
-            print('player stays')
-            break
-        else:
-            print('player hits!')
-            new_card = deal_card(deck)
-            print(f'New card is a {new_card['card']} of {new_card['suite']}')
-            hand.append(new_card)
-            display_hands(game_data)
 
 def game_end(game_data):
     for player in game_data['player_hands']:
@@ -176,42 +176,11 @@ def game_end(game_data):
         return False
 
 def dealer_turn(hand, deck):
-    if is_blackjack(hand):
-        print('Dealer has blackjack! Game is over')
-        return
-    
-    while True:
-        dealer_hand_total = hand_total(hand)
-        if dealer_hand_total >= 17:
-            print('Dealer total >= 17, dealer stays')
-            break
-        else:
-            print('Dealer hits!')
-            new_card = deal_card(deck)
-            print(f'Dealers new card: {new_card}')
-            hand.append(new_card)
-            display_hands(game_data, dealer_turn=True)
-
-        if busted(hand):
-            print('dealer busts!')
-            break
+    pass
 
 # Gets winner, does not return a tie yet.
 def get_winner(game_results):
-    '''
-    Determines and returns winner if no player won with
-    blackjack
-    '''
-    def dict_values(key):
-        '''
-        Helper function for max()
-        '''
-        return game_results[key]
-
-    winners = {player : total for player, total in game_results.items()
-               if total != 'bust'}
-    
-    print(f'Winner is: {max(winners, key=dict_values)}')
+    pass
 
 def play_again():
     prompt('Would you like to play again? (y/n)')
@@ -231,7 +200,6 @@ def main():
         game_data = initialize_game_data_structure(deck)
         game_results = initialize_game_results_dict(game_data)
 
-        # start
         deal_hands(game_data)
         display_hands(game_data)
         player1_hand = get_hand('player1', game_data)
@@ -240,6 +208,7 @@ def main():
         # Player turn:
         players_turn(player1_hand, deck)
         adjust_game_results(game_data, game_results)
+
         if game_end(game_data):
             prompt('Game is over')
 
