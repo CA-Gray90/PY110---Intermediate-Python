@@ -15,6 +15,10 @@ def prompt(message):
 def clear_terminal():
     os.system('clear')
 
+def enter_to_continue():
+    prompt('Press Enter to continue...')
+    input()
+
 def get_valid_input(*valid_answers):
     '''
     You can pass any number of arguments as 'valid answers' to check against.
@@ -152,6 +156,11 @@ def players_turn(hand, deck):
         return 'hit'
 
 # Dealer turn
+
+def dealer_got_blackjack(game_data):
+    dealer_hand = game_data['player_hands']['dealer']
+    return is_blackjack(dealer_hand)
+
 def dealer_turn(hand, deck):
     dealer_hand_total = hand_total(hand)
 
@@ -203,8 +212,11 @@ def game_end(game_data):
             return True
         return False
 
-# Gets winner, does not return a tie yet.
+# Gets winner unfinished.
 def get_winner(game_results):
+    # Must differenciate between blackjacks -> winner / draw
+    # totals that equal draw
+    # outright winner
     pass
 
 def play_again():
@@ -226,13 +238,17 @@ def main():
         game_results = initialize_game_results_dict(game_data)
 
         deal_hands(game_data)
-        # display_hands(game_data)
-        # player1_hand = get_hand('player1', game_data)
-        # dealer_hand = get_hand('dealer', game_data)
 
         # Player turn:
         while True:
             display_hands(game_data)
+
+            if dealer_got_blackjack(game_data):
+                # if player_got_blackjack(game_data) - cont
+                prompt("Dealer has peeked through the hole and"
+                       " they have a blackjack!")
+                break
+
             outcome = turn('player1', game_data)
             adjust_game_results(game_data, game_results)
             if outcome != 'hit':
@@ -240,7 +256,8 @@ def main():
     
         if game_end(game_data):
             prompt('Game is over')
-        else:   # Dealer Turn
+        # Dealer turn
+        else:
             while True:
                 display_hands(game_data, dealer=True)
                 outcome = turn('dealer', game_data, dealer=True)
@@ -254,3 +271,6 @@ def main():
             break
 
 main()
+
+# TODO: Fix up blackjack check functions
+# Determine winner function
