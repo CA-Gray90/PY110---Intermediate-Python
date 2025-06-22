@@ -1,6 +1,7 @@
 # Initializing a deck of cards:
 import random
 import os
+import pdb
 
 CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10',
          'jack', 'queen', 'king', 'ace']
@@ -108,13 +109,33 @@ def hand_total(hand):
 def busted(hand):
     return hand_total(hand) > 21
 
-# Check for blackjack:
+# Check for blackjacks:
 def is_blackjack(hand):
     '''
     Blackjack only happens when the player's first two cards equal 21.
     Automatic win.
     '''
     return hand_total(hand) == 21 and len(hand) == 2
+
+def check_for_blackjack(game_data):
+    '''
+    Checks for a blackjack in all players hands (including dealer)
+    '''
+    blackjack_exists = False
+
+    for player in game_data['player_hands']:
+        hand = get_hand(player, game_data)
+
+        if is_blackjack(hand):
+            if player == 'dealer':
+                prompt(f'The {player} has peeked through the hole'
+                       ' and has a blackjack!')
+            else:
+                prompt(f'{player} has a Blackjack!')
+
+            blackjack_exists = True
+        
+    return blackjack_exists
 
 def automatic_stay(hand):
     '''
@@ -157,10 +178,6 @@ def players_turn(hand, deck):
 
 # Dealer turn
 
-def dealer_got_blackjack(game_data):
-    dealer_hand = game_data['player_hands']['dealer']
-    return is_blackjack(dealer_hand)
-
 def dealer_turn(hand, deck):
     dealer_hand_total = hand_total(hand)
 
@@ -178,9 +195,6 @@ def turn(who, game_data, dealer=False):
     hand = get_hand(who, game_data)
     deck = game_data['deck']
 
-    if is_blackjack(hand):
-        prompt(f'{who} got a blackjack!')
-        return
     if automatic_stay(hand):
         prompt(f'{who} made 21, this is an automatic stay.')
         return
@@ -210,7 +224,8 @@ def game_end(game_data):
         hand = get_hand(player, game_data)
         if busted(hand) or is_blackjack(hand):
             return True
-        return False
+
+    return False
 
 # Gets winner unfinished.
 def get_winner(game_results):
@@ -246,19 +261,19 @@ def main():
         while True:
             display_hands(game_data)
 
-            if dealer_got_blackjack(game_data):
-                # if player_got_blackjack(game_data) - cont
-                prompt("Dealer has peeked through the hole and"
-                       " they have a blackjack!")
+            if check_for_blackjack(game_data):
+                adjust_game_results(game_data, game_results)
+                display_hands(game_data, dealer=True)
                 break
 
             outcome = turn('player1', game_data)
             adjust_game_results(game_data, game_results)
             if outcome != 'hit':
                 break
-    
+        # pdb.set_trace()
+
         if game_end(game_data):
-            prompt('Game is over')
+            prompt('Game is over.')
         # Dealer turn
         else:
             while True:
