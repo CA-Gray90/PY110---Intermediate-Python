@@ -311,16 +311,71 @@ dealer turn():
 5. IF not busted but >= 17:
     Check for winner by comparing totals > Different function outside of dealer turn
 
-#### Determining winner:
-Create a new dict called game_results that tallys results as we go?
-Simpler for determining the winner at end of game.
+## Determining winner:
+##### P
+Creating a function that returns the winner of the game.
 
+Input:
+results_dict
+A dict that contains the results of the game.
 e.g:
-game_results = {
-    player1 : total,
-    player2 : total,
-    dealer : total
+= {
+    player1 : <value>,
+    dealer : <value>,
+    }
+
+<value> can be:
+    - Integer <= 21
+    - 'bust'
+    - 'blackjack'
+
+Output:
+Winner name, or draw
+
+RULES:
+- Winner must be determined in this order:
+    - players/dealer with 'bust' lose
+    - players/dealer with 'blackjack' win UNLESS:
+        - Another player has 'blackjack' in which case it is a DRAW
+    - Finally, player/dealer with the highest score wins UNLESS:
+        - Two players have the same score in which case it is a DRAW
+
+###### E
+Input:
+result_dict = {
+    'player1' : <Value>,
+    'dealer' : <value>
 }
+
+Output:
+
+'player1'   | 'dealer'    | Output:
+------------|-------------|---------
+'bust'      |  0 (any)    | 'dealer'
+0 (any)     | 'bust'      | 'player1'
+'blackjack' |  0 (any).   | 'player1'
+'blackjack' | 'blackjack' | `draw`
+0 (any).    | 'blackjack' | 'dealer'
+18          | 20          | 'dealer'
+21          | 17          | 'player1'
+18          | 18          | `draw`
+
+###### D
+
+###### A
+High Level:
+1. Did any players bust?
+    - IF yes, the other player/dealer wins
+2. Did any players get blackjack? 
+    - If yes, check if any other players got blackjack in which case it is a `draw`
+    - If no, then this player wins
+3. Compare the totals of the players:
+    - If they are the same, it is a `draw`
+    - Otherwise player with highest score wins
+
+match / case?
+Iterate through the players to compare values, can we do this in one loop?
+
 
 ##### Adjust Game results:
 Take in the game dict, and determine game results applying them to the game

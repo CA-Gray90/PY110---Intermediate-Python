@@ -227,12 +227,44 @@ def game_end(game_data):
 
     return False
 
-# Gets winner unfinished.
+# Get winner
+def compare_totals(game_results):
+    def get_values(key):
+        '''
+        Helper function for max()
+        '''
+        return game_results[key]
+
+    filtered_results = {player : value for player, value in game_results.items()
+                        if isinstance(value, int)}
+
+    scores = list(filtered_results.values())
+    is_draw = all([score == scores[0]for score in scores[1:]])
+
+    if is_draw:
+        return 'draw'
+    return max(game_results, key=get_values)
+
 def get_winner(game_results):
-    # Must differenciate between blackjacks -> winner / draw
-    # totals that equal draw
-    # outright winner
-    pass
+    '''
+    Gets winner for 2 player games only at this stage.
+    '''
+    filtered_for_bust = {player : value for player, value in game_results.items()
+                   if value != 'bust'}
+    
+    if len(filtered_for_bust) < 2:
+        return list(filtered_for_bust.keys())[0] # Returns player without 'bust'
+
+    blackjack_winners = [winner for winner, value in filtered_for_bust.items()
+                         if value == 'blackjack']
+
+    if blackjack_winners:
+        if len(blackjack_winners) < 2:
+            return blackjack_winners[0]
+        else:
+            return 'draw'
+
+    return compare_totals(game_results)
 
 def play_again():
     prompt('Would you like to play again? (y/n)')
@@ -284,7 +316,11 @@ def main():
                     break
 
         print(game_results)
-        get_winner(game_results)
+        winner = get_winner(game_results)
+        if winner != 'draw':
+            prompt(f'{winner} won this game!')
+        else:
+            prompt('The game was a draw!')
         if not play_again():
             break
 
