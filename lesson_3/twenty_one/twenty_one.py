@@ -232,6 +232,9 @@ def set_up_deck():
 # Main
 def main():
     while True:
+        # Clear terminal
+        clear_terminal()
+
         # set up:
         deck = set_up_deck()
         game_data = initialize_game_data_structure(deck)
