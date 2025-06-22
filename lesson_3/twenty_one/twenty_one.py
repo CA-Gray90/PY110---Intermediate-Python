@@ -146,7 +146,7 @@ def automatic_stay(hand):
 
 def display_hands(game_data, dealer=False):
     # Simple display of all hands for now
-    # clear_terminal()
+
     print()
     prompt('============= DISPLAY ============')
     for player_hand in game_data['player_hands']:
@@ -290,5 +290,7 @@ def main():
 
 main()
 
-# TODO: Fix up blackjack check functions
+# TODO:
 # Determine winner function
+# Display winner function
+# Improve Game UX and UI using ascii art, game pauses and delays etc
