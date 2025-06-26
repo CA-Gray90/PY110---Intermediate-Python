@@ -154,7 +154,35 @@ def display_ascii_hand(player, hand, dealers_turn=False):
 
         else:
             display_ascii_card(card)
+    if not dealers_turn and player != 'dealer':
+        prompt(f'Hand total: {hand_total(hand)}')
+    elif dealers_turn:
+        prompt(f"Dealer's hand total: {hand_total(hand)}")
     print()
+
+## Get hand total
+## Calculating aces:
+def calc_ace(hand_total):
+    '''
+    Aces are worth 1 or 11 depending on context
+    '''
+    return 1 if hand_total >= 11 else 11
+
+def hand_total(hand):
+    total = 0
+    aces = 0
+
+    for card_dict in hand:
+        card = card_dict['card']
+        if card != 'ace':
+            total += int(card) if card.isdigit() else COURT_CARD_VALUE
+        else:
+            aces += 1
+
+    for _ in range(aces):
+        total += calc_ace(total)
+
+    return total
 
 display_ascii_hand('player1', hand)
 hand = get_hand('dealer', game_data)
