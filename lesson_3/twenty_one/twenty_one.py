@@ -3,7 +3,7 @@ import os
 import pdb
 
 CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10',
-         'jack', 'queen', 'king', 'ace']
+         'J', 'Q', 'K', 'A']
 SUITES = ['diamonds', 'clubs', 'hearts', 'spades']
 PLAYERS = 1
 CARDS_PER_HAND = 2
@@ -144,36 +144,116 @@ def automatic_stay(hand):
     '''
     return hand_total(hand) == 21 and len(hand) > 2
 
-def display_hands(game_data, dealer=False):
-    # Simple display of all hands for now
+# def display_hands(game_data, dealer=False):
+#     # Simple display of all hands for now
 
-    print()
-    prompt('============= DISPLAY ============')
-    for player_hand in game_data['player_hands']:
-        hand = get_hand(player_hand, game_data)
-        if player_hand != 'dealer':
-            print(f'{player_hand} : {hand}')
-            print(f'Total: {hand_total(hand)}')
-        elif dealer != True and player_hand == 'dealer':
-            print(f'Dealers first card: {hand[0]}')
-        elif dealer == True:
-            print(f'Dealers hand revealed: {hand}')
-            print(f'Dealers total: {hand_total(hand)}')
-    print()
+#     print()
+#     prompt('============= DISPLAY ============')
+#     for player_hand in game_data['player_hands']:
+#         hand = get_hand(player_hand, game_data)
+#         if player_hand != 'dealer':
+#             print(f'{player_hand} : {hand}')
+#             print(f'Total: {hand_total(hand)}')
+#         elif dealer != True and player_hand == 'dealer':
+#             print(f'Dealers first card: {hand[0]}')
+#         elif dealer == True:
+#             print(f'Dealers hand revealed: {hand}')
+#             print(f'Dealers total: {hand_total(hand)}')
+#     print()
+def ascii_card_value_top(v, hide=False):
+    if not hide:
+        return f'| {str(v).ljust(2, ' ')}        |'
+    return f'| ^  ^^^  ^ |'
 
-def display_hands(game_data, dealer=False):
-    print()
-    prompt('============= DISPLAY ============')
-    for player_hand in game_data['player_hands']:
-        hand = get_hand(player_hand, game_data)
-        if player_hand != 'dealer':
-            print(f'{player_hand} : {hand}')
-            print(f'Total: {hand_total(hand)}')
-        elif dealer != True and player_hand == 'dealer':
-            print(f'Dealers first card: {hand[0]}')
-        elif dealer == True:
-            print(f'Dealers hand revealed: {hand}')
-            print(f'Dealers total: {hand_total(hand)}')
+def ascii_card_value_bottom(v, hide=False):
+    if not hide:
+        return f'|        {str(v).rjust(2, ' ')} |'
+    return f'| ^  ^^^  ^ |'
+
+def ascii_card_suites_display(ascii_card_suites, suite, hide=False):
+    if not hide:
+        return (f'{ascii_card_suites[suite]['top']}\n'
+          f'{ascii_card_suites[suite]['mid_1']}\n'
+          f'{ascii_card_suites[suite]['mid_2']}\n'
+          f'{ascii_card_suites[suite]['bottom']}')
+
+    return (f'{ascii_card_suites['back']['top']}\n'
+          f'{ascii_card_suites['back']['mid_1']}\n'
+          f'{ascii_card_suites['back']['mid_2']}\n'
+          f'{ascii_card_suites['back']['bottom']}')
+
+def display_ascii_card(card, hide=False):
+    value = card['card']
+    suite = card['suite']
+
+    ascii_card_edge = '+-----------+'
+
+    ascii_card_suites = {
+        'diamonds' : {
+            'top' : '|     ^     |',
+            'mid_1' : '|   /   k   |',
+            'mid_2' : '|   Y   /   |',
+            'bottom' : '|     .     |'
+        },
+        'spades'   : {
+            'top' : '|     .     |',
+            'mid_1' : '|    /.k    |',
+            'mid_2' : '|   ( . )   |',
+            'bottom': '|    .^.    |'
+        },
+        'hearts'   : {
+            'top' : '|   _   _   |',
+            'mid_1' : '|  ( `V` )  |',
+            'mid_2' : '|   Y. .Y   |',
+            'bottom' : '|     Y     |'
+        },
+        'clubs'    : {
+            'top' : '|     _     |',
+            'mid_1' : '|    ( )    |',
+            'mid_2' : '|  (_,|,_)  |',
+            'bottom': '|    .^.    |'
+    },
+        'back' : {
+            'top' : '|   ^ ^ ^   |',
+            'mid_1' : '|  ^ ^^^ ^  |',
+            'mid_2' : '|  ^ ^^^ ^  |',
+            'bottom' : '|   ^ ^ ^   |'
+        }
+    }
+
+    print(ascii_card_edge)
+    if not hide:
+        print(ascii_card_value_top(value))
+        print(ascii_card_suites_display(ascii_card_suites, suite))
+        print(ascii_card_value_bottom(value))
+    else:
+        print(ascii_card_value_top(value, hide=True))
+        print(ascii_card_suites_display(ascii_card_suites, suite, hide=True))
+        print(ascii_card_value_bottom(value, hide=True))
+    print(ascii_card_edge)
+
+def display_ascii_hand(player, game_data, dealers_turn=False):
+    hand = get_hand(player, game_data)
+
+    if not dealers_turn:
+        prompt(f"{player.capitalize()}'s hand:")
+    else:
+        prompt(f"Dealer's hand revealed")
+
+    for num, card in enumerate(hand):
+        if player == 'dealer' and not dealers_turn:
+            if num == 0:
+                display_ascii_card(card)
+            else:
+                display_ascii_card(card, hide=True)
+
+        else:
+            display_ascii_card(card)
+
+    if not dealers_turn and player != 'dealer':
+        prompt(f'Hand total: {hand_total(hand)}')
+    elif dealers_turn:
+        prompt(f"Dealer's hand total: {hand_total(hand)}")
     print()
 
 # Players turn
@@ -342,17 +422,20 @@ def main():
         game_results = initialize_game_results_dict(game_data)
 
         deal_hands(game_data)
-        display_hands(game_data)
+        display_ascii_hand('player1', game_data)
+        display_ascii_hand('dealer', game_data)
+
         game_on = True
 
         if check_for_blackjack(game_data):
             adjust_game_results(game_data, game_results)
-            display_hands(game_data, dealer=True)
+            display_ascii_hand('player1', game_data)
+            display_ascii_hand('dealer', game_data, dealers_turn=True)
             game_on = False
 
         # Player turn loop:
         while game_on:
-            display_hands(game_data)
+            display_ascii_hand('player1', game_data)
 
             outcome = turn('player1', game_data)
             adjust_game_results(game_data, game_results)
@@ -364,7 +447,7 @@ def main():
         # Dealer turn
         else:
             while True:
-                display_hands(game_data, dealer=True)
+                display_ascii_hand('dealer', game_data, dealers_turn=True)
                 outcome = turn('dealer', game_data, dealer=True)
                 adjust_game_results(game_data, game_results)
                 if outcome != 'hit':

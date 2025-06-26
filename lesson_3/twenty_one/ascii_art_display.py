@@ -152,7 +152,9 @@ def display_ascii_card(card, hide=False):
         print(ascii_card_value_bottom(value, hide=True))
     print(ascii_card_edge)
 
-def display_ascii_hand(player, hand, dealers_turn=False):
+def display_ascii_hand(player, game_data, dealers_turn=False):
+    hand = get_hand(player, game_data)
+
     if not dealers_turn:
         prompt(f"{player.capitalize()}'s hand:")
     else:
@@ -185,8 +187,8 @@ hand = get_hand('player1', game_data)
 print(f'Hand dict: {hand}')
 print()
 
-display_ascii_hand('player1', hand)
-hand = get_hand('dealer', game_data)
-display_ascii_hand('dealer', hand)
+display_ascii_hand('player1', game_data)
+# hand = get_hand('dealer', game_data)
+display_ascii_hand('dealer', game_data)
 # print('Dealers Turn (hand revealed):')
-display_ascii_hand('dealer', hand, dealers_turn=True)
+display_ascii_hand('dealer', game_data, dealers_turn=True)
