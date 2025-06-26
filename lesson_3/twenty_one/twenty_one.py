@@ -69,7 +69,7 @@ def deal_card(deck):
 ## Deal out hand:
 def deal_hands(game_data):
     '''
-    Deals each player two cards, one at a time.
+    Deals each player two cards, one at a time as per real game.
     '''
     deck = game_data['deck']
 
@@ -120,8 +120,9 @@ def is_blackjack(hand):
 def check_for_blackjack(game_data):
     '''
     Checks for a blackjack in all players hands (including dealer)
+    Returns Boolean
     '''
-    blackjack_exists = False
+    has_blackjack = False
 
     for player in game_data['player_hands']:
         hand = get_hand(player, game_data)
@@ -133,9 +134,9 @@ def check_for_blackjack(game_data):
             else:
                 prompt(f'{player} has a Blackjack!')
 
-            blackjack_exists = True
+            has_blackjack = True
         
-    return blackjack_exists
+    return has_blackjack
 
 def automatic_stay(hand):
     '''
@@ -182,7 +183,7 @@ def dealer_turn(hand, deck):
     dealer_hand_total = hand_total(hand)
 
     if dealer_hand_total >= 17:
-        prompt('Dealer total is >= 17; the Dealer stays.')
+        prompt('Dealers total is >= 17; the Dealer stays.')
         return 'stay'
     else:
         print('Dealer hits!')
@@ -202,7 +203,7 @@ def turn(who, game_data, dealer=False):
         prompt(f'{who} busted!')
         return
     
-    if dealer == False:
+    if not dealer:
         outcome = players_turn(hand, deck)
         return outcome
     else:
@@ -266,6 +267,45 @@ def get_winner(game_results):
 
     return compare_totals(game_results)
 
+def display_game_results(game_results):
+    def str_len(obj):
+        '''
+        Helper function to get length of string or integer
+        '''
+        if isinstance(obj, int):
+            return len(str(obj))
+        else:
+            return len(obj)
+
+    player_display_len = len(max(game_results.keys(), key=len))
+    method_display_len = str_len(max(game_results.values(), key=str_len))
+    total_display_len = player_display_len + method_display_len
+
+    print()
+    prompt('The results of this game were:')
+    print('+-' + '-' * (total_display_len + 2) + '-+')
+    for player in game_results:
+        print(f'| {player.capitalize().ljust(player_display_len, ' ')}: '
+              f'{str(game_results[player]).capitalize().ljust(method_display_len, ' ')} |')
+    print('+-' + '-' * (total_display_len + 2) + '-+')
+    print()
+
+def display_winner(winner, game_results):
+    display_game_results(game_results)
+
+    if winner != 'draw':
+        method = game_results[winner]
+        if isinstance(method, int):
+            if 'bust' not in game_results.values():
+                method = 'higher total value'
+            else:
+                method = 'bust from other player'
+
+        prompt(f'{winner} won the game via a {method}!')
+    else:
+        prompt('The game was a draw!')
+    pass
+
 def play_again():
     prompt('Would you like to play again? (y/n)')
     answer = get_valid_input('y', 'yes', 'n', 'no')
@@ -288,21 +328,22 @@ def main():
         game_results = initialize_game_results_dict(game_data)
 
         deal_hands(game_data)
+        display_hands(game_data)
+        game_on = True
 
-        # Player turn:
-        while True:
+        if check_for_blackjack(game_data):
+            adjust_game_results(game_data, game_results)
+            display_hands(game_data, dealer=True)
+            game_on = False
+
+        # Player turn loop:
+        while game_on:
             display_hands(game_data)
-
-            if check_for_blackjack(game_data):
-                adjust_game_results(game_data, game_results)
-                display_hands(game_data, dealer=True)
-                break
 
             outcome = turn('player1', game_data)
             adjust_game_results(game_data, game_results)
             if outcome != 'hit':
                 break
-        # pdb.set_trace()
 
         if game_end(game_data):
             prompt('Game is over.')
@@ -315,18 +356,12 @@ def main():
                 if outcome != 'hit':
                     break
 
-        print(game_results)
         winner = get_winner(game_results)
-        if winner != 'draw':
-            prompt(f'{winner} won this game!')
-        else:
-            prompt('The game was a draw!')
+        display_winner(winner, game_results)
         if not play_again():
             break
 
 main()
 
 # TODO:
-# Determine winner function
-# Display winner function
 # Improve Game UX and UI using ascii art, game pauses and delays etc
