@@ -55,16 +55,29 @@ def deal_hands(game_data):
 def get_hand(player, game_data):
     return game_data['player_hands'][player]
 
-# Set up
-deck = initialize_deck()
-shuffle(deck)
+## Get hand total
+## Calculating aces:
+def calc_ace(hand_total):
+    '''
+    Aces are worth 1 or 11 depending on context
+    '''
+    return 1 if hand_total >= 11 else 11
 
-game_data = initialize_game_data_structure(deck)
-deal_hands(game_data)
-hand = get_hand('player1', game_data)
+def hand_total(hand):
+    total = 0
+    aces = 0
 
-print(f'Hand dict: {hand}')
-print()
+    for card_dict in hand:
+        card = card_dict['card']
+        if card != 'ace':
+            total += int(card) if card.isdigit() else COURT_CARD_VALUE
+        else:
+            aces += 1
+
+    for _ in range(aces):
+        total += calc_ace(total)
+
+    return total
 
 # Developing the function:
 def ascii_card_value_top(v, hide=False):
@@ -154,35 +167,23 @@ def display_ascii_hand(player, hand, dealers_turn=False):
 
         else:
             display_ascii_card(card)
+
     if not dealers_turn and player != 'dealer':
         prompt(f'Hand total: {hand_total(hand)}')
     elif dealers_turn:
         prompt(f"Dealer's hand total: {hand_total(hand)}")
     print()
 
-## Get hand total
-## Calculating aces:
-def calc_ace(hand_total):
-    '''
-    Aces are worth 1 or 11 depending on context
-    '''
-    return 1 if hand_total >= 11 else 11
+# Set up display
+deck = initialize_deck()
+shuffle(deck)
 
-def hand_total(hand):
-    total = 0
-    aces = 0
+game_data = initialize_game_data_structure(deck)
+deal_hands(game_data)
+hand = get_hand('player1', game_data)
 
-    for card_dict in hand:
-        card = card_dict['card']
-        if card != 'ace':
-            total += int(card) if card.isdigit() else COURT_CARD_VALUE
-        else:
-            aces += 1
-
-    for _ in range(aces):
-        total += calc_ace(total)
-
-    return total
+print(f'Hand dict: {hand}')
+print()
 
 display_ascii_hand('player1', hand)
 hand = get_hand('dealer', game_data)
