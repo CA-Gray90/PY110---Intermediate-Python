@@ -1,4 +1,3 @@
-# Initializing a deck of cards:
 import random
 import os
 import pdb
@@ -148,6 +147,21 @@ def automatic_stay(hand):
 def display_hands(game_data, dealer=False):
     # Simple display of all hands for now
 
+    print()
+    prompt('============= DISPLAY ============')
+    for player_hand in game_data['player_hands']:
+        hand = get_hand(player_hand, game_data)
+        if player_hand != 'dealer':
+            print(f'{player_hand} : {hand}')
+            print(f'Total: {hand_total(hand)}')
+        elif dealer != True and player_hand == 'dealer':
+            print(f'Dealers first card: {hand[0]}')
+        elif dealer == True:
+            print(f'Dealers hand revealed: {hand}')
+            print(f'Dealers total: {hand_total(hand)}')
+    print()
+
+def display_hands(game_data, dealer=False):
     print()
     prompt('============= DISPLAY ============')
     for player_hand in game_data['player_hands']:
