@@ -5,9 +5,13 @@ import pdb
 CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10',
          'J', 'Q', 'K', 'A']
 SUITES = ['diamonds', 'clubs', 'hearts', 'spades']
+
 PLAYERS = 1
 CARDS_PER_HAND = 2
 COURT_CARD_VALUE = 10
+BLACKJACK = 21
+DEALER_STAY = 17
+BEST_OF = 3
 
 def prompt(message):
     print(f'=> {message}')
@@ -106,7 +110,7 @@ def hand_total(hand):
 
 # Check for busted:
 def busted(hand):
-    return hand_total(hand) > 21
+    return hand_total(hand) > BLACKJACK
 
 # Check for blackjacks:
 def is_blackjack(hand):
@@ -114,7 +118,7 @@ def is_blackjack(hand):
     Blackjack only happens when the player's first two cards equal 21.
     Automatic win.
     '''
-    return hand_total(hand) == 21 and len(hand) == 2
+    return hand_total(hand) == BLACKJACK and len(hand) == CARDS_PER_HAND
 
 def check_for_blackjack(game_data):
     '''
@@ -142,7 +146,7 @@ def automatic_stay(hand):
     Automatic stay is triggered when players hand total reaches 21.
     Doesn't include Blackjack hand.
     '''
-    return hand_total(hand) == 21 and len(hand) > 2
+    return hand_total(hand) == BLACKJACK and len(hand) > CARDS_PER_HAND
 
 def ascii_card_value_top(v, hide=False):
     if not hide:
@@ -260,8 +264,8 @@ def players_turn(hand, deck):
 def dealer_turn(hand, deck):
     dealer_hand_total = hand_total(hand)
 
-    if dealer_hand_total >= 17:
-        prompt('Dealers total is >= 17; the Dealer stays.')
+    if dealer_hand_total >= DEALER_STAY:
+        prompt(f'Dealers total is >= {DEALER_STAY}; the Dealer stays.')
         return 'stay'
     else:
         print('Dealer hits!')
@@ -332,7 +336,7 @@ def get_winner(game_results):
                    if value != 'bust'}
     
     if len(filtered_for_bust) < 2:
-        return list(filtered_for_bust.keys())[0] # Returns player without 'bust'
+        return list(filtered_for_bust.keys())[0]
 
     blackjack_winners = [winner for winner, value in filtered_for_bust.items()
                          if value == 'blackjack']
@@ -346,6 +350,7 @@ def get_winner(game_results):
     return compare_totals(game_results)
 
 def display_game_results(game_results):
+
     def str_len(obj):
         '''
         Helper function to get length of string or integer
