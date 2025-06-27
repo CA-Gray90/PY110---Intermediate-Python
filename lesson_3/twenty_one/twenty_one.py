@@ -2,16 +2,15 @@ import random
 import os
 import pdb
 
+BEST_OF = 4
+BLACKJACK = 21
 CARDS = ['2', '3', '4', '5', '6', '7', '8', '9', '10',
          'J', 'Q', 'K', 'A']
-SUITES = ['diamonds', 'clubs', 'hearts', 'spades']
-
-PLAYERS = 1
 CARDS_PER_HAND = 2
 COURT_CARD_VALUE = 10
-BLACKJACK = 21
 DEALER_STAY = 17
-BEST_OF = 3
+PLAYERS = 1
+SUITES = ['diamonds', 'clubs', 'hearts', 'spades']
 
 def prompt(message):
     print(f'=> {message}')
@@ -412,14 +411,21 @@ def initialize_best_of_scores(players):
     return best_of_scores
 
 def display_best_of_scores(scores):
-    # Simple display for now
-    print(scores)
+    scores_title = f'**** Best of {BEST_OF} ****'
+
+    print()
+    print(scores_title)
+
+    for player in scores:
+        line = f'{player.capitalize()} : {scores[player]}'
+        print(f'* {line.center(len(scores_title) - 3, ' ')}*')
+
+    print('*' * len(scores_title))
+    print()
 
 def update_best_of_scores(winner, scores):
-    print(f'Winner: {winner}')
     if winner != 'draw':
         scores[winner] = scores.get(winner) + 1
-    print(scores)
 
 def end_best_of(scores):
     if sum(scores.values()) == BEST_OF:
@@ -432,9 +438,20 @@ def end_best_of(scores):
             return True
     return False
 
-def get_best_of_winner(scores):
-    pass
+def display_best_of_winner(scores):
+    def get_values(key):
+        '''
+        Helper function for max()
+        '''
+        return scores[key]
 
+    if list(scores.values())[0] == list(scores.values())[1]:
+        prompt(f'The overall game was a draw!')
+    else:
+        winner = max(scores, key=get_values)
+
+        prompt(f'{winner.capitalize()} is the overall winner! They won the most'
+            f' games out of {BEST_OF}.')
 
 # Main
 def main():
@@ -495,6 +512,8 @@ def main():
 
             if not play_again():
                 break
+        display_best_of_scores(scores)
+        display_best_of_winner(scores)
 
         if not play_again(best_of=True):
             break
