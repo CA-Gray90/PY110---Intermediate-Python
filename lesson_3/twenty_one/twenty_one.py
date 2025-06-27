@@ -97,9 +97,9 @@ def hand_total(hand):
     aces = 0
 
     for card_dict in hand:
-        card = card_dict['card']
-        if card != 'ace':
-            total += int(card) if card.isdigit() else COURT_CARD_VALUE
+        value = card_dict['card']
+        if value != 'A':
+            total += int(value) if value.isdigit() else COURT_CARD_VALUE
         else:
             aces += 1
 
@@ -132,7 +132,7 @@ def check_for_blackjack(game_data):
 
         if is_blackjack(hand):
             if player == 'dealer':
-                prompt(f'The {player} has peeked through the hole'
+                prompt(f'The Dealer has peeked through the hole'
                        ' and has a blackjack!')
             else:
                 prompt(f'{player} has a Blackjack!')
@@ -389,9 +389,15 @@ def display_winner(winner, game_results):
         prompt('The game was a draw!')
     pass
 
-def play_again():
-    prompt('Would you like to play again? (y/n)')
-    answer = get_valid_input('y', 'yes', 'n', 'no')
+def play_again(best_of=False):
+    yes_no_options = ('y', 'yes', 'no', 'n')
+
+    if not best_of:
+        prompt('Are you ready to play the next game? (y/n)')
+    else:
+        prompt(f'Would you like to play another Best of {BEST_OF}?')
+
+    answer = get_valid_input(*yes_no_options)
     return answer.lower()[0] == 'y'
 
 def set_up_deck():
@@ -399,54 +405,99 @@ def set_up_deck():
     shuffle(deck)
     return deck
 
+def initialize_best_of_scores(players):
+    best_of_scores = {f'player{num}' : 0 for num in range(1, players + 1)}
+    best_of_scores.update({'dealer' : 0})
+
+    return best_of_scores
+
+def display_best_of_scores(scores):
+    # Simple display for now
+    print(scores)
+
+def update_best_of_scores(winner, scores):
+    print(f'Winner: {winner}')
+    if winner != 'draw':
+        scores[winner] = scores.get(winner) + 1
+    print(scores)
+
+def end_best_of(scores):
+    if sum(scores.values()) == BEST_OF:
+        prompt(f'Best of {BEST_OF} game is over.')
+        return True
+    for player in scores:
+        if scores[player] > BEST_OF // 2:
+            prompt(f'Best of {BEST_OF} game terminated early. {player} has'
+                   f' the majority wins out of {BEST_OF}.')
+            return True
+    return False
+
+def get_best_of_winner(scores):
+    pass
+
+
 # Main
 def main():
     while True:
-        # Clear terminal
         clear_terminal()
+        prompt(f'This is a Best of {BEST_OF} Rounds game.')
+        scores = initialize_best_of_scores(1)
+        display_best_of_scores(scores)
+        prompt('Are you ready to begin?')
+        enter_to_continue()
 
-        # set up:
-        deck = set_up_deck()
-        game_data = initialize_game_data_structure(deck)
-        game_results = initialize_game_results_dict(game_data)
+        while True:
+            # Clear terminal
+            clear_terminal()
 
-        deal_hands(game_data)
-        display_ascii_hand('player1', game_data)
-        display_ascii_hand('dealer', game_data)
+            # set up:
+            deck = set_up_deck()
+            game_data = initialize_game_data_structure(deck)
+            game_results = initialize_game_results_dict(game_data)
 
-        game_on = True
-
-        if check_for_blackjack(game_data):
-            adjust_game_results(game_data, game_results)
+            deal_hands(game_data)
             display_ascii_hand('player1', game_data)
-            display_ascii_hand('dealer', game_data, dealers_turn=True)
-            game_on = False
+            display_ascii_hand('dealer', game_data)
 
-        # Player turn loop:
-        while game_on:
-            display_ascii_hand('player1', game_data)
+            game_on = True
 
-            outcome = turn('player1', game_data)
-            adjust_game_results(game_data, game_results)
-            if outcome != 'hit':
-                break
-
-        if game_end(game_data):
-            prompt('Game is over.')
-        # Dealer turn
-        else:
-            while True:
+            if check_for_blackjack(game_data):
+                adjust_game_results(game_data, game_results)
+                display_ascii_hand('player1', game_data)
                 display_ascii_hand('dealer', game_data, dealers_turn=True)
-                outcome = turn('dealer', game_data, dealer=True)
+                game_on = False
+
+            # Player turn loop:
+            while game_on:
+                display_ascii_hand('player1', game_data)
+
+                outcome = turn('player1', game_data)
                 adjust_game_results(game_data, game_results)
                 if outcome != 'hit':
                     break
 
-        winner = get_winner(game_results)
-        display_winner(winner, game_results)
-        if not play_again():
-            break
+            if game_end(game_data):
+                prompt('Game is over.')
+            # Dealer turn
+            else:
+                while True:
+                    display_ascii_hand('dealer', game_data, dealers_turn=True)
+                    outcome = turn('dealer', game_data, dealer=True)
+                    adjust_game_results(game_data, game_results)
+                    if outcome != 'hit':
+                        break
 
+            winner = get_winner(game_results)
+            display_winner(winner, game_results)
+            update_best_of_scores(winner, scores)
+            if end_best_of(scores):
+                break
+
+            if not play_again():
+                break
+
+        if not play_again(best_of=True):
+            break
 main()
 
 # TODO:
