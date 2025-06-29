@@ -51,8 +51,8 @@ def display_rules():
     def lst_txt(text):
         print(f'- {text}')
         print()
-
-    prompt('Here are the rules (assuming the User has some basic knowledge of'
+    print('*' * len(GAME_TITLE))
+    prompt('RULES:\n(Assuming the User has some basic knowledge of'
            ' Blackjack and the value of the cards):')
     print()
     lst_txt(f'In this card game, you are attempting to get a total value as' 
@@ -65,10 +65,9 @@ def display_rules():
     lst_txt("The Dealer must 'Hit' till thier total is equal to or greater than"
             f' {DEALER_STAY}.')
     lst_txt("Equal total values equals a 'Draw'.")
-    lst_txt(f'This game has multiple games with the overall winner being best'
-            f' out of {BEST_OF}.')
+    lst_txt(f'The overall winner is best out of {BEST_OF}.')
     print()
-    prompt('Are you ready to play?')
+    print('*' * len(GAME_TITLE))
 
 def enter_to_continue():
     prompt('Press Enter to continue...')
@@ -168,7 +167,6 @@ def check_for_blackjack(game_data):
 
     for player in game_data['player_hands']:
         hand = get_hand(player, game_data)
-        pdb.set_trace()
         if is_blackjack(hand):
             if player == 'dealer':
                 prompt(f'The Dealer has peeked through the hole'
@@ -290,14 +288,15 @@ def display_hand_oneline(player, game_data):
     '''
 
     hand = get_hand(player, game_data)
-    card_1 = hand[0]['card']
-    card_2 = hand[1]['card']
+    cards = ', '.join([card['card'] for card in hand])
 
     if player != 'dealer':
-        print(f"({player.capitalize()}'s hand: {card_1}, {card_2}. Total:"
+        print(f"({player.capitalize()}'s hand: {cards}. Total:"
               f" {hand_total(hand)})")
     else:
-        print(f"(Dealers hand: {card_1}, Unknown. Total: Unknown)")
+        print(f"(Dealers hand: {hand[0]['card']}, Unknown. Total: Unknown)")
+    print()
+    print('*' * len(GAME_TITLE))
 
 # Players turn
 def players_turn(hand, deck):
@@ -322,7 +321,7 @@ def dealer_turn(hand, deck):
         prompt(f'Dealers total is >= {DEALER_STAY}; the Dealer stays.')
         return 'stay'
     else:
-        prompt('Dealer hits!')
+        prompt('Dealer will Hit!')
         new_card = deal_card(deck)
         hand.append(new_card)
         return 'hit'
@@ -332,11 +331,12 @@ def turn(who, game_data, dealer=False):
     deck = game_data['deck']
 
     if automatic_stay(hand):
-        prompt(f'{who} made 21, this is an automatic stay.')
+        prompt(f'{who.capitalize()} made 21, this is an automatic stay.')
         enter_to_continue()
         return
     if busted(hand):
-        prompt(f'{who} busted!')
+        prompt(f'{who.capitalize()} busted!')
+        prompt('Game is over.')
         return
     
     if not dealer:
@@ -404,7 +404,6 @@ def get_winner(game_results):
     return compare_totals(game_results)
 
 def display_game_results(game_results):
-
     def str_len(obj):
         '''
         Helper function to get length of string or integer
@@ -438,7 +437,7 @@ def display_winner(winner, game_results):
             else:
                 method = 'bust from other player'
 
-        prompt(f'{winner} won the game via a {method}!')
+        prompt(f'{winner.capitalize()} won the game via a {method}!')
     else:
         prompt('The game was a draw!')
     pass
@@ -449,7 +448,7 @@ def play_again(best_of=False):
     if not best_of:
         prompt('Are you ready to play the next game? (y/n)')
     else:
-        prompt(f'Would you like to play another Best of {BEST_OF}?')
+        prompt(f'Would you like to play another Best of {BEST_OF}? (y/n)')
 
     answer = get_valid_input(*yes_no_options)
     return answer.lower()[0] == 'y'
@@ -505,23 +504,23 @@ def display_best_of_winner(scores):
     else:
         winner = max(scores, key=get_values)
 
-        prompt(f'{winner.capitalize()} is the overall winner! They won the'
-               f' most games out of {BEST_OF}.')
+        prompt(f'*** {winner.capitalize()} *** is the overall winner!')
 
 def display_dealing_cards():
+    time.sleep(1)
+    prompt('Shuffling cards...')
+    time.sleep(1)
     prompt('Dealing cards...')
     time.sleep(1)
-    for num in range(1, 5):
-        if num in [1, 3]:
-            print(f'Dealt Player card {num}')
-        else:
-            print(f'Dealt Dealer card {num}')
-        time.sleep(1)
 
 def clear_and_display_scores(scores):
     clear_terminal()
     display_game_title()
     display_best_of_scores(scores)
+
+def display_goodbye():
+    prompt('Thanks for playing!')
+    print('Program terminated.')
 
 # Main
 def main():
@@ -570,7 +569,7 @@ def main():
             # Player turn loop:
             while game_on:
                 clear_and_display_scores(scores)
-                prompt('Players Turn')
+                prompt('PLAYERS TURN')
                 display_ascii_hand('player1', game_data)
                 display_hand_oneline('dealer', game_data)
 
@@ -580,14 +579,13 @@ def main():
                     break
 
             if game_end(game_data):
-                prompt('Game is over.')
                 enter_to_continue()
 
             # Dealer turn
             else:
                 while True:
                     clear_and_display_scores(scores)
-                    prompt('Dealers Turn')
+                    prompt('DEALERS TURN')
                     display_ascii_hand('dealer', game_data, dealers_turn=True)
                     display_hand_oneline('player1', game_data)
 
@@ -601,17 +599,18 @@ def main():
             update_best_of_scores(winner, scores)
             clear_and_display_scores(scores)
             display_winner(winner, game_results)
+
             if end_best_of(scores):
-                enter_to_continue()
                 break
 
             if not play_again():
                 break
 
-        clear_and_display_scores(scores)
+        print() # Line break
         display_best_of_winner(scores)
 
         if not play_again(best_of=True):
+            display_goodbye()
             break
 main()
 
