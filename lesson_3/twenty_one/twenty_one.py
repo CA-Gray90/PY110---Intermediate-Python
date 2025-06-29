@@ -75,17 +75,19 @@ def enter_to_continue():
 
 # Initialize empty deck:    
 def initialize_deck():
-    # deck = []
-    # for suite in SUITES:
-    #     for card in CARDS:
-    #         deck.append({'card' : card, 'suite': suite})
+    deck = []
+    for suite in SUITES:
+        for card in CARDS:
+            deck.append({'card' : card, 'suite': suite})
+    
+    return deck
+    # deck = [{'card' : 'J', 'suite' : 'spades'},
+    #         {'card' : 'J', 'suite' : 'spades'},
+    #         {'card' : 'A', 'suite' : 'spades'}, # Player gets blackjack
+    #         {'card' : 'K', 'suite' : 'spades'}, # Dealer gets blackjack
+    #         {'card' : 'J', 'suite' : 'spades'}]
     
     # return deck
-    deck = [{'card' : 'J', 'suite' : 'spades'},
-            {'card' : 'J', 'suite' : 'spades'},
-            {'card' : 'A', 'suite' : 'spades'}, # Player gets blackjack
-            {'card' : 'J', 'suite' : 'spades'},
-            {'card' : 'J', 'suite' : 'spades'}]
 
 # Initialize game data structure:
 def initialize_game_data_structure(deck, players=1):
@@ -292,7 +294,7 @@ def display_ascii_hand(player, game_data, dealers_turn=False):
     hand_result = 'Blackjack!' if is_blackjack(hand) else hand_total(hand)
 
     if not dealers_turn and player != 'dealer':
-        prompt(f'Hand total: {hand_total(hand)}')
+        prompt(f'Hand total: {hand_result}')
     elif dealers_turn:
         prompt(f"Dealer's hand total: {hand_result}")
     print()
