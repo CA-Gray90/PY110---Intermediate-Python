@@ -75,12 +75,17 @@ def enter_to_continue():
 
 # Initialize empty deck:    
 def initialize_deck():
-    deck = []
-    for suite in SUITES:
-        for card in CARDS:
-            deck.append({'card' : card, 'suite': suite})
+    # deck = []
+    # for suite in SUITES:
+    #     for card in CARDS:
+    #         deck.append({'card' : card, 'suite': suite})
     
-    return deck
+    # return deck
+    deck = [{'card' : 'J', 'suite' : 'spades'},
+            {'card' : 'J', 'suite' : 'spades'},
+            {'card' : 'A', 'suite' : 'spades'}, # Player gets blackjack
+            {'card' : 'J', 'suite' : 'spades'},
+            {'card' : 'J', 'suite' : 'spades'}]
 
 # Initialize game data structure:
 def initialize_game_data_structure(deck, players=1):
@@ -100,7 +105,13 @@ def initialize_game_results_dict(game_data):
 
 # Shuffling a deck of cards:
 def shuffle(deck):
-    random.shuffle(deck)
+    # random.shuffle(deck)
+    pass
+
+def set_up_deck():
+    deck = initialize_deck()
+    shuffle(deck)
+    return deck
 
 # Deal players hands:
 ## Deal one card out (mutating)
@@ -171,8 +182,10 @@ def check_for_blackjack(game_data):
             if player == 'dealer':
                 prompt(f'The Dealer has peeked through the hole'
                        ' and has a Blackjack!')
+                prompt('Game is over.')
             else:
-                prompt(f'{player} has a Blackjack!')
+                prompt(f'{player.capitalize()} has a Blackjack!')
+                prompt('Game is over.')
 
             has_blackjack = True
             enter_to_continue()
@@ -276,10 +289,12 @@ def display_ascii_hand(player, game_data, dealers_turn=False):
         else:
             display_ascii_card(card)
 
+    hand_result = 'Blackjack!' if is_blackjack(hand) else hand_total(hand)
+
     if not dealers_turn and player != 'dealer':
         prompt(f'Hand total: {hand_total(hand)}')
     elif dealers_turn:
-        prompt(f"Dealer's hand total: {hand_total(hand)}")
+        prompt(f"Dealer's hand total: {hand_result}")
     print()
 
 def display_hand_oneline(player, game_data):
@@ -419,11 +434,13 @@ def display_game_results(game_results):
 
     print()
     prompt('The results of this game were:')
-    print('+-' + '-' * (total_display_len + 2) + '-+')
+    top = '+-' + '-' * (total_display_len + 2) + '-+'
+    print(top.center(len(GAME_TITLE), ' '))
     for player in game_results:
-        print(f'| {player.capitalize().ljust(player_display_len, ' ')}: '
-              f'{str(game_results[player]).capitalize().ljust(method_display_len, ' ')} |')
-    print('+-' + '-' * (total_display_len + 2) + '-+')
+        line = (f'| {player.capitalize().ljust(player_display_len, ' ')}:'
+                f' {str(game_results[player]).capitalize().ljust(method_display_len, ' ')} |')
+        print(line.center(len(GAME_TITLE), ' '))
+    print(top.center(len(GAME_TITLE), ' '))
     print()
 
 def display_winner(winner, game_results):
@@ -453,11 +470,6 @@ def play_again(best_of=False):
     answer = get_valid_input(*yes_no_options)
     return answer.lower()[0] == 'y'
 
-def set_up_deck():
-    deck = initialize_deck()
-    shuffle(deck)
-    return deck
-
 def initialize_best_of_scores(players):
     best_of_scores = {f'player{num}' : 0 for num in range(1, players + 1)}
     best_of_scores.update({'dealer' : 0})
@@ -465,16 +477,17 @@ def initialize_best_of_scores(players):
     return best_of_scores
 
 def display_best_of_scores(scores):
-    scores_title = f'**** Best of {BEST_OF} ****'
+    scores_title = f'+=== Best of {BEST_OF} ===+'
 
     print()
-    print(scores_title)
+    print(scores_title.center(len(GAME_TITLE), ' '))
 
     for player in scores:
         line = f'{player.capitalize()} : {scores[player]}'
-        print(f'* {line.center(len(scores_title) - 3, ' ')}*')
+        print(f'| {line.center(len(scores_title) - 3, ' ')}|'.center(len(GAME_TITLE), ' '))
 
-    print('*' * len(scores_title))
+    bottom = '+' + '=' * (len(scores_title) - 2) + '+'
+    print(bottom.center(len(GAME_TITLE), ' '))
     print()
 
 def update_best_of_scores(winner, scores):
@@ -487,8 +500,9 @@ def end_best_of(scores):
         return True
     for player in scores:
         if scores[player] > BEST_OF // 2:
-            prompt(f'Best of {BEST_OF} game terminated early. {player} has'
-                   f' the majority wins out of {BEST_OF}.')
+            prompt(f'Best of {BEST_OF} game terminated early.' 
+                   f' {player.capitalize()} has the majority wins out of'
+                    f' {BEST_OF}.')
             return True
     return False
 
@@ -565,35 +579,35 @@ def main():
                 game_on = False
             
             enter_to_continue()
-
-            # Player turn loop:
-            while game_on:
-                clear_and_display_scores(scores)
-                prompt('PLAYERS TURN')
-                display_ascii_hand('player1', game_data)
-                display_hand_oneline('dealer', game_data)
-
-                outcome = turn('player1', game_data)
-                adjust_game_results(game_data, game_results)
-                if outcome != 'hit':
-                    break
-
-            if game_end(game_data):
-                enter_to_continue()
-
-            # Dealer turn
-            else:
+            if game_on:
+                # Player turn loop:
                 while True:
                     clear_and_display_scores(scores)
-                    prompt('DEALERS TURN')
-                    display_ascii_hand('dealer', game_data, dealers_turn=True)
-                    display_hand_oneline('player1', game_data)
+                    prompt('PLAYERS TURN')
+                    display_ascii_hand('player1', game_data)
+                    display_hand_oneline('dealer', game_data)
 
-                    outcome = turn('dealer', game_data, dealer=True)
+                    outcome = turn('player1', game_data)
                     adjust_game_results(game_data, game_results)
-                    enter_to_continue()
                     if outcome != 'hit':
                         break
+
+                if game_end(game_data):
+                    enter_to_continue()
+
+                # Dealer turn
+                else:
+                    while True:
+                        clear_and_display_scores(scores)
+                        prompt('DEALERS TURN')
+                        display_ascii_hand('dealer', game_data, dealers_turn=True)
+                        display_hand_oneline('player1', game_data)
+
+                        outcome = turn('dealer', game_data, dealer=True)
+                        adjust_game_results(game_data, game_results)
+                        enter_to_continue()
+                        if outcome != 'hit':
+                            break
 
             winner = get_winner(game_results)
             update_best_of_scores(winner, scores)
@@ -606,7 +620,7 @@ def main():
             if not play_again():
                 break
 
-        print() # Line break
+        print()
         display_best_of_winner(scores)
 
         if not play_again(best_of=True):
