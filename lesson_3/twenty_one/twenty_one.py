@@ -73,25 +73,26 @@ def enter_to_continue():
 
 # Initializing Deck
 def initialize_deck():
-    # deck = []
-    # for suite in SUITES:
-    #     for card in CARDS:
-    #         deck.append({'card' : card, 'suite': suite})
+    deck = []
+    for suite in SUITES:
+        for card in CARDS:
+            deck.append({'card' : card, 'suite': suite})
     
-    # return deck
-
-    deck = [
-        {'card' : 'K', 'suite': 'diamonds'}, # player
-        {'card' : 'K', 'suite': 'diamonds'}, # dealer
-        {'card' : 'K', 'suite': 'diamonds'}, # player
-        {'card' : '6', 'suite': 'diamonds'}, # dealer
-        {'card' : '5', 'suite': 'diamonds'}, # next card dealt
-        {'card' : 'K', 'suite': 'diamonds'}
-        ]
     return deck
 
+    # Play around with different card combinations:
+    # deck = [
+    #     {'card' : 'K', 'suite': 'diamonds'}, # player
+    #     {'card' : 'K', 'suite': 'diamonds'}, # dealer
+    #     {'card' : 'K', 'suite': 'diamonds'}, # player
+    #     {'card' : '6', 'suite': 'diamonds'}, # dealer
+    #     {'card' : '5', 'suite': 'diamonds'}, # next card dealt
+    #     {'card' : 'K', 'suite': 'diamonds'}
+    #     ]
+    # return deck
+
 def shuffle(deck):
-    # random.shuffle(deck)
+    random.shuffle(deck) # Comment this out if playing with card combinations
     pass
 
 def set_up_deck():
