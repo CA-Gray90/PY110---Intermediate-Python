@@ -1,7 +1,7 @@
-import random
+import json
 import os
+import random
 import time
-import pdb
 
 BEST_OF = 3
 BLACKJACK = 21
@@ -13,6 +13,9 @@ DEALER_STAY = 17
 PLAYERS = 1
 SUITES = ['diamonds', 'clubs', 'hearts', 'spades']
 GAME_TITLE = '*' * 10 + ' TWENTY ONE ' + '*' * 10
+
+with open("messages_21.json", "r") as file:
+    MESSAGES = json.load(file)
 
 def prompt(message):
     print(f'=> {message}')
@@ -30,7 +33,7 @@ def get_valid_input(*valid_answers):
         answer = input().strip()
         if answer.lower() in valid_answers:
             return answer
-        print("Oops, that isn't a valid answer, try again:")
+        print(MESSAGES["invalid_input"])
 
 def display_game_title():
     print(GAME_TITLE)
@@ -39,8 +42,7 @@ def display_welcome():
     print('Welcome to:'.center(len(GAME_TITLE), ' '))
     display_game_title()
     print()
-    prompt('This is a game similar to the Casino game Blackjack but with a few'
-           ' simplifications.')
+    prompt(MESSAGES["welcome_msg"])
 
 def see_rules():
     prompt('Would you like to see the rule set? (y/n)')
@@ -52,20 +54,16 @@ def display_rules():
         print(f'- {text}')
         print()
     print('*' * len(GAME_TITLE))
-    prompt('RULES:\n(Assuming the User has some basic knowledge of'
-           ' Blackjack and the value of the cards):')
+    prompt(MESSAGES["rules_title"])
     print()
-    lst_txt(f'In this card game, you are attempting to get a total value as' 
-            f' close to {BLACKJACK} as possible without going over.')
-    lst_txt(f'If either the Player or Dealer gets {BLACKJACK} with thier first two'
-            ' cards, it is an immediate win (Natural Blackjack).')
-    lst_txt(f"If the Player gets to {BLACKJACK}, it is an automatic 'Stay'.")
-    lst_txt(f"A total over {BLACKJACK} is a 'Bust'")
-    lst_txt('Once it is the Dealers turn, thier 2nd card will be revealed.')
-    lst_txt("The Dealer must 'Hit' till thier total is equal to or greater than"
-            f' {DEALER_STAY}.')
-    lst_txt("Equal total values equals a 'Draw'.")
-    lst_txt(f'The overall winner is best out of {BEST_OF}.')
+    lst_txt(MESSAGES["rules_1_1"] + f'{BLACKJACK}' + MESSAGES["rules_1_2"])
+    lst_txt(MESSAGES["rules_2_1"] + f'{BLACKJACK}' + MESSAGES["rules_2_2"])
+    lst_txt(MESSAGES["rules_3_1"] + f'{BLACKJACK}' + MESSAGES["rules_3_2"])
+    lst_txt(MESSAGES["rules_4_1"] + f'{BLACKJACK}' + MESSAGES["rules_4_2"])
+    lst_txt(MESSAGES["rules_5"])
+    lst_txt(MESSAGES["rules_6"] + f'{DEALER_STAY}.')
+    lst_txt(MESSAGES["rules_7"])
+    lst_txt(MESSAGES["rules_8"] + f'{BEST_OF}.')
     print()
     print('*' * len(GAME_TITLE))
 
@@ -73,23 +71,35 @@ def enter_to_continue():
     prompt('Press Enter to continue...')
     input()
 
-# Initialize empty deck:    
+# Initializing Deck
 def initialize_deck():
-    deck = []
-    for suite in SUITES:
-        for card in CARDS:
-            deck.append({'card' : card, 'suite': suite})
-    
-    return deck
-    # deck = [{'card' : 'J', 'suite' : 'spades'},
-    #         {'card' : 'J', 'suite' : 'spades'},
-    #         {'card' : 'A', 'suite' : 'spades'}, # Player gets blackjack
-    #         {'card' : 'K', 'suite' : 'spades'}, # Dealer gets blackjack
-    #         {'card' : 'J', 'suite' : 'spades'}]
+    # deck = []
+    # for suite in SUITES:
+    #     for card in CARDS:
+    #         deck.append({'card' : card, 'suite': suite})
     
     # return deck
 
-# Initialize game data structure:
+    deck = [
+        {'card' : 'K', 'suite': 'diamonds'}, # player
+        {'card' : 'K', 'suite': 'diamonds'}, # dealer
+        {'card' : 'K', 'suite': 'diamonds'}, # player
+        {'card' : '6', 'suite': 'diamonds'}, # dealer
+        {'card' : '5', 'suite': 'diamonds'}, # next card dealt
+        {'card' : 'K', 'suite': 'diamonds'}
+        ]
+    return deck
+
+def shuffle(deck):
+    # random.shuffle(deck)
+    pass
+
+def set_up_deck():
+    deck = initialize_deck()
+    shuffle(deck)
+    return deck
+
+# Initializing Game Data Structures
 def initialize_game_data_structure(deck, players=1):
     '''
     2nd argument is for number of players in game. Minimum 1 player.
@@ -101,26 +111,12 @@ def initialize_game_data_structure(deck, players=1):
         'player_hands' : player_hands | {'dealer' : []}
     }
 
-# Initialize dict where game results are kept track:
 def initialize_game_results_dict(game_data):
     return {player : 0 for player in game_data['player_hands']}
 
-# Shuffling a deck of cards:
-def shuffle(deck):
-    # random.shuffle(deck)
-    pass
-
-def set_up_deck():
-    deck = initialize_deck()
-    shuffle(deck)
-    return deck
-
-# Deal players hands:
-## Deal one card out (mutating)
 def deal_card(deck):
     return deck.pop(0)
 
-## Deal out hand:
 def deal_hands(game_data):
     '''
     Deals each player two cards, one at a time as per real game.
@@ -134,15 +130,10 @@ def deal_hands(game_data):
 def get_hand(player, game_data):
     return game_data['player_hands'][player]
 
-# Calculating hand with aces:
-## Calculating aces:
+# Calculating hand total:
 def calc_ace(hand_total):
-    '''
-    Aces are worth 1 or 11 depending on context
-    '''
     return 1 if hand_total >= 11 else 11
 
-## Get hand total
 def hand_total(hand):
     total = 0
     aces = 0
@@ -159,11 +150,9 @@ def hand_total(hand):
 
     return total
 
-# Check for busted:
 def busted(hand):
     return hand_total(hand) > BLACKJACK
 
-# Check for blackjacks:
 def is_blackjack(hand):
     '''
     Blackjack only happens when the player's first two cards equal 21.
@@ -182,12 +171,10 @@ def check_for_blackjack(game_data):
         hand = get_hand(player, game_data)
         if is_blackjack(hand):
             if player == 'dealer':
-                prompt(f'The Dealer has peeked through the hole'
-                       ' and has a Blackjack!')
-                prompt('Game is over.')
+                prompt(MESSAGES["dealer_peek"])
             else:
                 prompt(f'{player.capitalize()} has a Blackjack!')
-                prompt('Game is over.')
+            prompt(MESSAGES["game_over"])
 
             has_blackjack = True
             enter_to_continue()
@@ -201,6 +188,7 @@ def automatic_stay(hand):
     '''
     return hand_total(hand) == BLACKJACK and len(hand) > CARDS_PER_HAND
 
+# Ascii display functions:
 def ascii_card_value_top(v, hide=False):
     if not hide:
         return f'| {str(v).ljust(2, ' ')}        |'
@@ -315,7 +303,7 @@ def display_hand_oneline(player, game_data):
     print()
     print('*' * len(GAME_TITLE))
 
-# Players turn
+# Player / Dealer Turn Functions
 def players_turn(hand, deck):
     prompt('Hit or Stay? (h/s)')
     answer = get_valid_input('h', 'hit', 's', 'stay')
@@ -328,8 +316,6 @@ def players_turn(hand, deck):
         new_card = deal_card(deck)
         hand.append(new_card)
         return 'hit'
-
-# Dealer turn
 
 def dealer_turn(hand, deck):
     dealer_hand_total = hand_total(hand)
@@ -349,8 +335,10 @@ def turn(who, game_data, dealer=False):
 
     if automatic_stay(hand):
         prompt(f'{who.capitalize()} made 21, this is an automatic stay.')
-        enter_to_continue()
+        if who != 'dealer':
+            enter_to_continue()
         return
+
     if busted(hand):
         prompt(f'{who.capitalize()} busted!')
         prompt('Game is over.')
@@ -363,6 +351,7 @@ def turn(who, game_data, dealer=False):
         outcome = dealer_turn(hand, deck)
         return outcome
 
+# Game Data structure adjustment functions
 def adjust_game_results(game_data, game_results):
     for player in game_data['player_hands']:
         hand = get_hand(player, game_data)
@@ -381,7 +370,6 @@ def game_end(game_data):
 
     return False
 
-# Get winner
 def compare_totals(game_results):
     def get_values(key):
         '''
@@ -472,6 +460,7 @@ def play_again(best_of=False):
     answer = get_valid_input(*yes_no_options)
     return answer.lower()[0] == 'y'
 
+# Best of (3) Game Functions
 def initialize_best_of_scores(players):
     best_of_scores = {f'player{num}' : 0 for num in range(1, players + 1)}
     best_of_scores.update({'dealer' : 0})
@@ -540,10 +529,12 @@ def display_goodbye():
 
 # Main
 def main():
+    ask_display_rules = True
+
     while True:
         clear_terminal()
         display_welcome()
-        if see_rules():
+        if ask_display_rules and see_rules():
             display_rules()
             enter_to_continue()
 
@@ -628,6 +619,8 @@ def main():
         if not play_again(best_of=True):
             display_goodbye()
             break
+        else: 
+            ask_display_rules = False
 main()
 
 # TODO:

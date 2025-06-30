@@ -1,0 +1,19 @@
+{
+    "invalid_input" : "Oops, that isn't a valid answer, try again:",
+    "welcome_msg" : "This is a game similar to the Casino game Blackjack but with a few simplifications.",
+    "rules_title" : "RULES:\n(Assuming the User has some basic knowledge of Blackjack and the value of the cards):",
+    "rules_1_1" : "In this card game, you are attempting to get a total value as close to ",
+    "rules_1_2" : " as possible without going over.",
+    "rules_2_1" : "If either the Player or Dealer gets ",
+    "rules_2_2" : " with thier first two cards, it is an immediate win (Blackjack).",
+    "rules_3_1" : "If the Player gets to ",
+    "rules_3_2" : " with more than 2 cards, it is an automatic 'Stay'.",
+    "rules_4_1" : "A total over ",
+    "rules_4_2" : " is a 'Bust'.",
+    "rules_5" : "Once it is the Dealers turn, thier 2nd card will be revealed.",
+    "rules_6" : "The Dealer must 'Hit' till thier total is equal to or greater than ",
+    "rules_7" : "Equal total values equals a 'Draw'.",
+    "rules_8" : "The overall winner is best out of ",
+    "dealer_peek" : "The Dealer has peeked through the hole and has a Blackjack!",
+    "game_over" : "Game is over."
+}
