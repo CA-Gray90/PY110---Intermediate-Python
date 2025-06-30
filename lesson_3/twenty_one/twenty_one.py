@@ -17,6 +17,9 @@ GAME_TITLE = '*' * 10 + ' TWENTY ONE ' + '*' * 10
 with open("messages_21.json", "r") as file:
     MESSAGES = json.load(file)
 
+with open("ascii_card_suites.json", "r") as file:
+    ASCII_SUITES = json.load(file)
+
 def prompt(message):
     print(f'=> {message}')
 
@@ -218,38 +221,39 @@ def display_ascii_card(card, hide=False):
 
     ascii_card_edge = '+-----------+'
 
-    ascii_card_suites = {
-        'diamonds' : {
-            'top' : '|     ^     |',
-            'mid_1' : '|   /   k   |',
-            'mid_2' : '|   Y   /   |',
-            'bottom' : '|     .     |'
-        },
-        'spades'   : {
-            'top' : '|     .     |',
-            'mid_1' : '|    /.k    |',
-            'mid_2' : '|   ( . )   |',
-            'bottom': '|    .^.    |'
-        },
-        'hearts'   : {
-            'top' : '|   _   _   |',
-            'mid_1' : '|  ( `V` )  |',
-            'mid_2' : '|   Y. .Y   |',
-            'bottom' : '|     Y     |'
-        },
-        'clubs'    : {
-            'top' : '|     _     |',
-            'mid_1' : '|    ( )    |',
-            'mid_2' : '|  (_,|,_)  |',
-            'bottom': '|    .^.    |'
-    },
-        'back' : {
-            'top' : '|   ^ ^ ^   |',
-            'mid_1' : '|  ^ ^^^ ^  |',
-            'mid_2' : '|  ^ ^^^ ^  |',
-            'bottom' : '|   ^ ^ ^   |'
-        }
-    }
+    ascii_card_suites = ASCII_SUITES
+    # ascii_card_suites = {
+    #     'diamonds' : {
+    #         'top' : '|     ^     |',
+    #         'mid_1' : '|   /   k   |',
+    #         'mid_2' : '|   Y   /   |',
+    #         'bottom' : '|     .     |'
+    #     },
+    #     'spades'   : {
+    #         'top' : '|     .     |',
+    #         'mid_1' : '|    /.k    |',
+    #         'mid_2' : '|   ( . )   |',
+    #         'bottom': '|    .^.    |'
+    #     },
+    #     'hearts'   : {
+    #         'top' : '|   _   _   |',
+    #         'mid_1' : '|  ( `V` )  |',
+    #         'mid_2' : '|   Y. .Y   |',
+    #         'bottom' : '|     Y     |'
+    #     },
+    #     'clubs'    : {
+    #         'top' : '|     _     |',
+    #         'mid_1' : '|    ( )    |',
+    #         'mid_2' : '|  (_,|,_)  |',
+    #         'bottom': '|    .^.    |'
+    #     },
+    #     'back' : {
+    #         'top' : '|   ^ ^ ^   |',
+    #         'mid_1' : '|  ^ ^^^ ^  |',
+    #         'mid_2' : '|  ^ ^^^ ^  |',
+    #         'bottom' : '|   ^ ^ ^   |'
+    #     }
+    # }
 
     print(ascii_card_edge)
     if not hide:
