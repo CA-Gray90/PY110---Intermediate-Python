@@ -501,16 +501,17 @@ def display_goodbye():
 
 # Main
 def main():
-    ask_display_rules = True
+    first_play = True
 
     while True:
-        clear_terminal()
-        display_welcome()
-        if ask_display_rules and see_rules():
-            display_rules()
-            enter_to_continue()
+        if first_play:
+            clear_terminal()
+            display_welcome()
+            if see_rules():
+                display_rules()
+                enter_to_continue()
 
-        scores = initialize_best_of_scores(1)
+        scores = initialize_best_of_scores(PLAYERS)
         clear_and_display_scores(scores)
         prompt(f'This is a Best of {BEST_OF} Rounds game.')
         print()
@@ -592,10 +593,5 @@ def main():
             display_goodbye()
             break
         else: 
-            ask_display_rules = False
+            first_play = False
 main()
-
-# TODO:
-# Improve Game UX and UI using game pauses and delays etc
-# Simplify main function by breaking it up into other functions
-# Check all enter to continue positions, some seem unnecessary
