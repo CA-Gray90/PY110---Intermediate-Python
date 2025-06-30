@@ -109,8 +109,8 @@ while True:
 
     if busted(player_cards):
         display_results(dealer_cards, player_cards)
-        if play_again():
-            continue
+        if not play_again():
+            break
     else:
         prompt(f"You stayed at {total(player_cards)}")
 
@@ -125,8 +125,8 @@ while True:
     if busted(dealer_cards):
         prompt(f"Dealer total is now: {total(dealer_cards)}")
         display_results(dealer_cards, player_cards)
-        if play_again():
-            continue
+        if not play_again():
+            break
     else:
         prompt(f"Dealer stays at {total(dealer_cards)}")
 
